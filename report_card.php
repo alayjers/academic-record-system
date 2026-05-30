@@ -1,6 +1,6 @@
 <?php
 require_once 'includes/header.php';
-require_once 'config/database.php';
+require_once 'config/config.php';
 
 $student_id = isset($_GET['student_id']) ? (int)$_GET['student_id'] : 0;
 $semester = isset($_GET['semester']) ? (int)$_GET['semester'] : 1; 
