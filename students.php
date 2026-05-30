@@ -1,6 +1,6 @@
 <?php
 require_once 'includes/header.php';
-require_once 'config/database.php';
+require_once 'config/config.php';
 
 // Restrict to admin only
 if ($_SESSION['role'] != 'admin') {
