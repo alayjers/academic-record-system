@@ -2,6 +2,47 @@
 require_once 'includes/header.php';
 require_once 'config/config.php';
 
+// ============================================
+// ADDED DEPED CALCULATION LOGIC
+// ============================================
+function transmutate($initial_grade) {
+    $score = round($initial_grade, 2);
+    if ($score >= 100) return 100;
+    
+    $transmutation = [
+        98.40 => 99, 96.80 => 98, 95.20 => 97, 93.60 => 96, 92.00 => 95,
+        90.40 => 94, 88.80 => 93, 87.20 => 92, 85.60 => 91, 84.00 => 90,
+        82.40 => 89, 80.80 => 88, 79.20 => 87, 77.60 => 86, 76.00 => 85,
+        74.40 => 84, 72.80 => 83, 71.20 => 82, 69.60 => 81, 68.00 => 80,
+        66.40 => 79, 64.80 => 78, 63.20 => 77, 61.60 => 76, 60.00 => 75,
+        56.00 => 74, 52.00 => 73, 48.00 => 72, 44.00 => 71, 40.00 => 70,
+        36.00 => 69, 32.00 => 68, 28.00 => 67, 24.00 => 66, 20.00 => 65,
+        16.00 => 64, 12.00 => 63, 8.00 => 62, 4.00 => 61, 0.00 => 60
+    ];
+    
+    foreach ($transmutation as $min_range => $transmuted_grade) {
+        if ($score >= $min_range) return $transmuted_grade;
+    }
+    return 60;
+}
+
+function calculateCategory($scores_array, $max_scores_array, $weight) {
+    $total_score = 0;
+    $total_max = 0;
+    foreach ($scores_array as $score) {
+        if ($score !== '' && $score !== null) $total_score += floatval($score);
+    }
+    foreach ($max_scores_array as $max) {
+        $total_max += floatval($max);
+    }
+    $ws = 0;
+    if ($total_max > 0) {
+        $ps = ($total_score / $total_max) * 100;
+        $ws = $ps * $weight;
+    }
+    return $ws;
+}
+
 $student_id = isset($_GET['student_id']) ? (int)$_GET['student_id'] : 0;
 $semester = isset($_GET['semester']) ? (int)$_GET['semester'] : 1; 
 $school_year = isset($_GET['school_year']) ? $_GET['school_year'] : '2025-2026';
@@ -46,16 +87,24 @@ if ($student_id > 0) {
             $stmt->execute([$student_id, $semester, $subject['id'], $semester]);
             $assignments = $stmt->fetchAll();
             
-            $total_weighted = 0;
-            $total_weight = 0;
+            // Grouping by category for weighted calculation
+            $cat_scores = ['written' => [], 'performance' => [], 'exam' => []];
+            $cat_max = ['written' => [], 'performance' => [], 'exam' => []];
+
             foreach ($assignments as $a) {
-                if ($a['score'] !== null && $a['score'] !== '') {
-                    $percentage = ($a['score'] / $a['max_score']) * 100;
-                    $total_weighted += $percentage * ($a['weight'] / 100);
-                    $total_weight += $a['weight'];
-                }
+                $cat = $a['category'];
+                $cat_scores[$cat][] = $a['score'];
+                $cat_max[$cat][] = $a['max_score'];
             }
-            $final_grade = $total_weight > 0 ? round($total_weighted, 1) : 0;
+
+            // Apply 20-50-30 Weights
+            $ww_ws = calculateCategory($cat_scores['written'], $cat_max['written'], 0.20);
+            $pt_ws = calculateCategory($cat_scores['performance'], $cat_max['performance'], 0.50);
+            $st_ws = calculateCategory($cat_scores['exam'], $cat_max['exam'], 0.30);
+            
+            $initial_grade = $ww_ws + $pt_ws + $st_ws;
+            $final_grade = ($initial_grade > 0) ? transmutate($initial_grade) : 0;
+
             $subject_grades[] = [
                 'name' => $subject['name'],
                 'grade' => $final_grade,
