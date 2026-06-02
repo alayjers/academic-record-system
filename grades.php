@@ -3,55 +3,57 @@ require_once 'includes/header.php';
 require_once 'config/config.php';
 require_once 'includes/functions.php';
 
-// ============================================
-// TEACHER SECTION FILTERING
-// ============================================
 $user_id = $_SESSION['user_id'];
 $role = $_SESSION['role'];
-$teacher_name = $_SESSION['name'] ?? 'Teacher'; // Assuming name is stored in session
+$teacher_name = $_SESSION['name'] ?? 'Teacher';
 
-// Get allowed sections based on role
 if ($role == 'admin') {
-    $stmt = $pdo->query("SELECT DISTINCT section FROM students WHERE section IS NOT NULL AND section != '' ORDER BY section");
-    $allowed_sections = $stmt->fetchAll();
+    $stmt = $pdo->query("SELECT DISTINCT grade_level, section FROM students WHERE section IS NOT NULL AND section != '' ORDER BY grade_level ASC, section ASC");
+    $allowed_data = $stmt->fetchAll();
 } elseif ($role == 'advisory_teacher') {
-    $stmt = $pdo->prepare("SELECT section FROM advisory_section WHERE teacher_id = ?");
+    $stmt = $pdo->prepare("SELECT DISTINCT s.grade_level, s.section FROM advisory_section a JOIN students s ON a.section = s.section WHERE a.teacher_id = ? ORDER BY s.grade_level ASC, s.section ASC");
     $stmt->execute([$user_id]);
-    $allowed_sections = $stmt->fetchAll();
+    $allowed_data = $stmt->fetchAll();
 } elseif ($role == 'subject_teacher') {
-    $stmt = $pdo->prepare("SELECT DISTINCT section FROM teacher_subject_section WHERE teacher_id = ?");
+    $stmt = $pdo->prepare("SELECT DISTINCT s.grade_level, tss.section FROM teacher_subject_section tss JOIN students s ON tss.section = s.section WHERE tss.teacher_id = ? ORDER BY s.grade_level ASC, s.section ASC");
     $stmt->execute([$user_id]);
-    $allowed_sections = $stmt->fetchAll();
+    $allowed_data = $stmt->fetchAll();
 } else {
-    $allowed_sections = [];
+    $allowed_data = [];
 }
 
-// Convert to simple array of section names
-$allowed_section_names = array_column($allowed_sections, 'section');
+$grade_sections_map = [];
+foreach ($allowed_data as $row) {
+    if (!empty($row['grade_level'])) {
+        $grade_sections_map[$row['grade_level']][] = $row['section'];
+    }
+}
 
-// Get current section from URL
+$allowed_grades = array_keys($grade_sections_map);
+
+$selected_grade = isset($_GET['grade_level']) ? (int)$_GET['grade_level'] : 0;
 $selected_section = isset($_GET['section']) ? $_GET['section'] : '';
-$selected_semester = isset($_GET['semester']) ? $_GET['semester'] : 1;
+$selected_semester = isset($_GET['semester']) ? (int)$_GET['semester'] : 1;
 $message = '';
 $message_type = '';
 
-// If no section selected and sections exist, pick first one
-if (empty($selected_section) && !empty($allowed_section_names)) {
-    $selected_section = $allowed_section_names[0];
+if ($selected_grade === 0 && !empty($allowed_grades)) {
+    $selected_grade = $allowed_grades[0];
 }
 
-// Verify teacher has access to selected section
-if (!empty($selected_section) && !in_array($selected_section, $allowed_section_names) && $role != 'admin') {
+$valid_sections_for_grade = $grade_sections_map[$selected_grade] ?? [];
+
+if (empty($selected_section) && !empty($valid_sections_for_grade)) {
+    $selected_section = $valid_sections_for_grade[0];
+}
+
+if (!empty($selected_section) && !in_array($selected_section, $valid_sections_for_grade) && $role != 'admin') {
     $selected_section = '';
-    $message = "You do not have access to that section.";
+    $message = "You do not have access to that section within this Grade Level.";
     $message_type = "error";
 }
 
-// ============================================
-// HANDLE SAVE (with audit log)
-// ============================================
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['save_grades'])) {
-    // Save max scores
     if (isset($_POST['max_score'])) {
         foreach ($_POST['max_score'] as $assignment_id => $max_score) {
             $stmt = $pdo->prepare("SELECT max_score FROM assignments WHERE id = ?");
@@ -69,7 +71,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['save_grades'])) {
         }
     }
     
-    // Save student scores
     if (isset($_POST['score'])) {
         foreach ($_POST['score'] as $student_id => $assignments) {
             if (empty($student_id) || !is_numeric($student_id)) continue;
@@ -90,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['save_grades'])) {
                         $stmt->execute([$score, $student_id, $assignment_id, $selected_semester]);
                     } else {
                         $stmt = $pdo->prepare("INSERT INTO scores (student_id, assignment_id, score, semester) VALUES (?, ?, ?, ?)");
-                        $stmt->execute([$student_id, $assignment_id, $score, $selected_semester]);
+                        $stmt->execute([$score, $student_id, $assignment_id, $selected_semester]);
                     }
                     
                     if ($old_score != $score) {
@@ -107,77 +108,84 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['save_grades'])) {
     $message_type = "success";
 }
 
-// ============================================
-// DEPED CALCULATION FUNCTIONS
-// ============================================
-function transmutate($initial_grade) {
-    $score = round($initial_grade, 2);
-    if ($score >= 100) return 100;
-    
-    $transmutation = [
-        98.40 => 99, 96.80 => 98, 95.20 => 97, 93.60 => 96, 92.00 => 95,
-        90.40 => 94, 88.80 => 93, 87.20 => 92, 85.60 => 91, 84.00 => 90,
-        82.40 => 89, 80.80 => 88, 79.20 => 87, 77.60 => 86, 76.00 => 85,
-        74.40 => 84, 72.80 => 83, 71.20 => 82, 69.60 => 81, 68.00 => 80,
-        66.40 => 79, 64.80 => 78, 63.20 => 77, 61.60 => 76, 60.00 => 75,
-        56.00 => 74, 52.00 => 73, 48.00 => 72, 44.00 => 71, 40.00 => 70,
-        36.00 => 69, 32.00 => 68, 28.00 => 67, 24.00 => 66, 20.00 => 65,
-        16.00 => 64, 12.00 => 63, 8.00 => 62, 4.00 => 61, 0.00 => 60
-    ];
-    
-    foreach ($transmutation as $min_range => $transmuted_grade) {
-        if ($score >= $min_range) return $transmuted_grade;
-    }
-    return 60;
-}
-
-function getDescriptor($term_grade) {
-    if ($term_grade >= 90) return 'Outstanding';
-    if ($term_grade >= 85) return 'Very Satisfactory';
-    if ($term_grade >= 80) return 'Satisfactory';
-    if ($term_grade >= 75) return 'Fairly Satisfactory';
-    return 'Did Not Meet Expectations';
-}
-
-function calculateCategory($scores_array, $max_scores_array, $weight) {
-    $total_score = 0;
-    $total_max = 0;
-    
-    foreach ($scores_array as $score) {
-        if ($score !== '' && $score !== null) {
-            $total_score += floatval($score);
+if (!function_exists('transmutate')) {
+    function transmutate($initial_grade) {
+        $score = round($initial_grade, 2);
+        if ($score >= 100) return 100;
+        
+        $transmutation = [
+            98.40 => 99, 96.80 => 98, 95.20 => 97, 93.60 => 96, 92.00 => 95,
+            90.40 => 94, 88.80 => 93, 87.20 => 92, 85.60 => 91, 84.00 => 90,
+            82.40 => 89, 80.80 => 88, 79.20 => 87, 77.60 => 86, 76.00 => 85,
+            74.40 => 84, 72.80 => 83, 71.20 => 82, 69.60 => 81, 68.00 => 80,
+            66.40 => 79, 64.80 => 78, 63.20 => 77, 61.60 => 76, 60.00 => 75,
+            56.00 => 74, 52.00 => 73, 48.00 => 72, 44.00 => 71, 40.00 => 70,
+            36.00 => 69, 32.00 => 68, 28.00 => 67, 24.00 => 66, 20.00 => 65,
+            16.00 => 64, 12.00 => 63, 8.00 => 62, 4.00 => 61, 0.00 => 60
+        ];
+        
+        foreach ($transmutation as $min_range => $transmuted_grade) {
+            if ($score >= $min_range) return $transmuted_grade;
         }
+        return 60;
     }
-    
-    foreach ($max_scores_array as $max) {
-        $total_max += floatval($max);
-    }
-    
-    $ps = 0;
-    $ws = 0;
-    if ($total_max > 0) {
-        $ps = ($total_score / $total_max) * 100;
-        $ws = $ps * $weight;
-    }
-    
-    return [
-        'total' => $total_score,
-        'ps' => $ps,
-        'ws' => $ws
-    ];
 }
 
-// ============================================
-// GET DATA FOR DISPLAY
-// ============================================
-$students = [];
-if ($selected_section) {
-    $stmt = $pdo->prepare("SELECT * FROM students WHERE section = ? ORDER BY name");
-    $stmt->execute([$selected_section]);
-    $students = $stmt->fetchAll();
+if (!function_exists('getDescriptor')) {
+    function getDescriptor($term_grade) {
+        if ($term_grade >= 90) return 'Outstanding';
+        if ($term_grade >= 85) return 'Very Satisfactory';
+        if ($term_grade >= 80) return 'Satisfactory';
+        if ($term_grade >= 75) return 'Fairly Satisfactory';
+        return 'Did Not Meet Expectations';
+    }
 }
 
-// Get assignments
+if (!function_exists('calculateCategory')) {
+    function calculateCategory($scores_array, $max_scores_array, $weight) {
+        $total_score = 0;
+        $total_max = 0;
+        
+        foreach ($scores_array as $score) {
+            if ($score !== '' && $score !== null) {
+                $total_score += floatval($score);
+            }
+        }
+        
+        foreach ($max_scores_array as $max) {
+            $total_max += floatval($max);
+        }
+        
+        $ps = 0;
+        $ws = 0;
+        if ($total_max > 0) {
+            $ps = ($total_score / $total_max) * 100;
+            $ws = $ps * $weight;
+        }
+        
+        return [
+            'total' => $total_score,
+            'ps' => $ps,
+            'ws' => $ws
+        ];
+    }
+}
+
+$students_male = [];
+$students_female = [];
+
+if ($selected_section && $selected_grade) {
+    $stmt = $pdo->prepare("SELECT * FROM students WHERE grade_level = ? AND section = ? AND (gender = 'Male' OR gender IS NULL OR gender = '') ORDER BY last_name, first_name");
+    $stmt->execute([$selected_grade, $selected_section]);
+    $students_male = $stmt->fetchAll();
+
+    $stmt = $pdo->prepare("SELECT * FROM students WHERE grade_level = ? AND section = ? AND gender = 'Female' ORDER BY last_name, first_name");
+    $stmt->execute([$selected_grade, $selected_section]);
+    $students_female = $stmt->fetchAll();
+}
+
+$all_students = array_merge($students_male, $students_female);
+
 $stmt = $pdo->prepare("SELECT * FROM assignments WHERE semester = ? ORDER BY 
     CASE category 
         WHEN 'written' THEN 1 
@@ -187,10 +195,9 @@ $stmt = $pdo->prepare("SELECT * FROM assignments WHERE semester = ? ORDER BY
 $stmt->execute([$selected_semester]);
 $assignments = $stmt->fetchAll();
 
-// Get existing scores
 $scores = [];
-if (!empty($students)) {
-    $student_ids = array_column($students, 'id');
+if (!empty($all_students)) {
+    $student_ids = array_column($all_students, 'id');
     $placeholders = implode(',', array_fill(0, count($student_ids), '?'));
     $stmt = $pdo->prepare("SELECT student_id, assignment_id, score FROM scores WHERE student_id IN ($placeholders) AND semester = ?");
     $params = array_merge($student_ids, [$selected_semester]);
@@ -200,7 +207,6 @@ if (!empty($students)) {
     }
 }
 
-// Separate assignments by category and prepare max scores array
 $written = []; $written_max = [];
 $performance = []; $performance_max = [];
 $exams = []; $exams_max = [];
@@ -220,12 +226,10 @@ foreach ($assignments as $a) {
     }
 }
 
-// Calculate grades for each student
 $student_data = [];
-foreach ($students as $student) {
+foreach ($all_students as $student) {
     $sid = $student['id'];
     
-    // Extract student's scores mapped to assignment IDs
     $ww_scores = [];
     foreach ($written as $w) { $ww_scores[$w['id']] = $scores[$sid][$w['id']] ?? null; }
     
@@ -235,7 +239,6 @@ foreach ($students as $student) {
     $st_scores = [];
     foreach ($exams as $e) { $st_scores[$e['id']] = $scores[$sid][$e['id']] ?? null; }
 
-    // Calculate using DepEd logic (20%, 50%, 30%)
     $ww_calc = calculateCategory($ww_scores, $written_max, 0.20);
     $pt_calc = calculateCategory($pt_scores, $performance_max, 0.50);
     $st_calc = calculateCategory($st_scores, $exams_max, 0.30);
@@ -251,203 +254,241 @@ foreach ($students as $student) {
         'term_grade' => $term_grade,
         'descriptor' => ($term_grade > 0) ? getDescriptor($term_grade) : ''
     ];
-
-    
 }
-
-
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>DepEd Class Record</title>
-    <style>
-        body { font-family: Arial, sans-serif; font-size: 12px; margin: 20px; background: #e0e0e0; }
-        
-        /* UI Tools Styling */
-        .tabs { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 20px; background: white; padding: 10px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .tab { padding: 8px 16px; background: #f0f0f0; text-decoration: none; color: #333; border-radius: 5px; font-weight: bold; }
-        .tab.active { background: #4CAF50; color: white; }
-        .toolbar { background: white; padding: 15px; margin-bottom: 20px; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .message { padding: 10px; margin-bottom: 15px; border-radius: 5px; }
-        .message.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .message.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        
-        /* DepEd Record Layout */
-        .record-container { width: 100%; overflow-x: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .header-title { text-align: center; font-size: 24px; font-weight: bold; margin-bottom: 10px; }
-        .header-grid { display: grid; grid-template-columns: auto 1fr auto 1fr; gap: 5px 10px; align-items: center; margin-bottom: 10px; font-weight: bold; }
-        .header-grid .line { border: 1px solid black; height: 20px; background-color: white; padding-left: 5px; display: flex; align-items: center; font-weight: normal; }
-        .logos-container { display: flex; justify-content: space-between; margin-bottom: 15px; }
-        .logo-placeholder { width: 80px; height: 80px; border: 2px solid #4CAF50; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 10px; color: #333; }
-        .info-bar { display: grid; grid-template-columns: 100px 1fr 1fr 1fr; border: 2px solid black; border-bottom: none; font-weight: bold; background: white; }
-        .info-bar div { border-right: 1px solid black; padding: 5px; display: flex; align-items: center; }
-        .info-bar div:last-child { border-right: none; }
-        
-        table { width: 100%; border-collapse: collapse; text-align: center; border: 2px solid black; }
-        th, td { border: 1px solid black; padding: 4px; white-space: nowrap; }
-        th { font-weight: bold; padding: 6px; }
-        .bg-blue { background-color: #00B0F0; color: white; }
-        .bg-magenta { background-color: #FF00FF; color: white; }
-        .bg-yellow { background-color: #FFFF00; }
-        .bg-green { background-color: #00FF00; }
-        .bg-white { background-color: #FFFFFF; }
-        .text-red { color: red; font-weight: bold; }
-        .text-left { text-align: left; padding-left: 5px; }
-        
-        input[type="number"] { width: 45px; text-align: center; border: 1px solid #ccc; padding: 4px; font-size: 11px; border-radius: 3px; }
-        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-        input[type=number] { -moz-appearance: textfield; }
-        
-        .save-btn { background-color: #4CAF50; color: white; padding: 10px 20px; border: none; cursor: pointer; font-size: 14px; border-radius: 4px; font-weight: bold; }
-        .save-btn:hover { background-color: #45a049; }
-        
-        .warning-cell { background-color: #ffcdd2 !important; }
-        .calculated-cell { font-weight: bold; background-color: #f5f5f5; }
-        
-        @media print {
-            body { background: white; margin: 0; padding: 0; }
-            .record-container { box-shadow: none; padding: 0; }
-            .tabs, .toolbar, .no-print, header, nav, footer { display: none !important; }
-        }
-    </style>
-</head>
-<body>
+<style>
+    .tabs-wrapper { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .tab-link { padding: 10px 18px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); text-decoration: none; color: var(--text-muted); border-radius: 8px; font-weight: 600; font-size: 13px; transition: all 0.2s; }
+    .tab-link:hover, .tab-link.active { background: var(--mode-btn-bg); border-color: var(--mode-btn-border); color: var(--mode-btn-text); }
+    
+    .grade-badge-container { border-bottom: 1px solid var(--border-card); padding-bottom: 14px; margin-bottom: 16px; }
+    .tab-link.grade-btn { background: rgba(0, 180, 216, 0.05); color: #00b4d8; border-color: rgba(0, 180, 216, 0.2); }
+    .tab-link.grade-btn.active { background: #00b4d8; color: #ffffff; border-color: #00b4d8; }
 
-    <div class="tabs no-print">
-        <?php foreach ($allowed_section_names as $sec): ?>
-            <a href="?section=<?php echo urlencode($sec); ?>&semester=<?php echo $selected_semester; ?>" 
-               class="tab <?php echo $selected_section == $sec ? 'active' : ''; ?>">
-                <?php echo htmlspecialchars($sec); ?>
-            </a>
-        <?php endforeach; ?>
-        <?php if (empty($allowed_section_names)): ?>
-            <span style="color:red; padding: 8px;">No sections assigned to you. Contact admin.</span>
-        <?php endif; ?>
-    </div>
+    .toolbar-panel { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
     
-    <div class="toolbar no-print">
-        <form method="GET" style="display: inline; font-size: 14px;">
-            <input type="hidden" name="section" value="<?php echo htmlspecialchars($selected_section); ?>">
-            <label style="font-weight: bold;">Select Term:</label>
-            <select name="semester" onchange="this.form.submit()" style="padding: 5px; border-radius: 3px; margin-left: 10px;">
-                <option value="1" <?php echo $selected_semester == 1 ? 'selected' : ''; ?>>1st Quarter</option>
-                <option value="2" <?php echo $selected_semester == 2 ? 'selected' : ''; ?>>2nd Quarter</option>
-                <option value="3" <?php echo $selected_semester == 3 ? 'selected' : ''; ?>>3rd Quarter</option>
-                <option value="4" <?php echo $selected_semester == 4 ? 'selected' : ''; ?>>4th Quarter</option>
-            </select>
-        </form>
-        <button type="submit" form="classRecordForm" class="save-btn">💾 Save All Grades</button>
-    </div>
+    .deped-table-container { width: 100%; overflow-x: auto; margin-top: 15px; border-radius: 12px; border: 1px solid var(--border-card); }
+    .deped-grade-table { width: 100%; border-collapse: collapse; text-align: center; font-size: 12px; }
+    .deped-grade-table th, .deped-grade-table td { border: 1px solid var(--border-card); padding: 8px; color: var(--input-text); }
+    .deped-grade-table th { font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
     
-    <?php if ($message): ?>
-        <div class="message <?php echo $message_type; ?> no-print"><?php echo $message; ?></div>
+    .th-blue { background-color: #0284c7; color: #ffffff !important; }
+    .th-magenta { background-color: #be185d; color: #ffffff !important; }
+    .th-yellow { background-color: #b45309; color: #ffffff !important; }
+    .th-green { background-color: #15803d; color: #ffffff !important; }
+    
+    .row-hps { background-color: rgba(0, 0, 0, 0.04); }
+    [data-theme="dark"] .row-hps, .dark-mode .row-hps { background-color: rgba(255, 255, 255, 0.05); }
+    
+    .gender-header-row { background-color: rgba(0, 180, 216, 0.08); font-weight: 700; text-align: left; color: #00b4d8; font-size: 13px; }
+    
+    .cell-calc { font-weight: 600; background-color: rgba(0, 0, 0, 0.04); color: var(--text-title); }
+    [data-theme="dark"] .cell-calc, .dark-mode .cell-calc { background-color: rgba(255, 255, 255, 0.04); }
+    
+    .cell-warning { background-color: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; }
+    
+    .text-highlight { color: #1d4ed8; font-weight: 700; }
+    [data-theme="dark"] .text-highlight, .dark-mode .text-highlight { color: #38bdf8; }
+    
+    .deped-grade-table input[type="number"] { background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 6px; color: var(--input-text); padding: 4px; width: 48px; text-align: center; }
+    .deped-grade-table input[type="number"]:focus { border-color: #38bdf8; outline: none; }
+</style>
+
+<h1>DepEd Class Record</h1>
+
+<?php if ($message): ?>
+    <div class="alert-msg <?php echo $message_type; ?>"><?php echo $message; ?></div>
+<?php endif; ?>
+
+<div class="tabs-wrapper grade-badge-container">
+    <?php foreach ($allowed_grades as $grade): ?>
+        <a href="?grade_level=<?php echo $grade; ?>&semester=<?php echo $selected_semester; ?>" 
+           class="tab-link grade-btn <?php echo $selected_grade == $grade ? 'active' : ''; ?>">
+            Grade <?php echo $grade; ?>
+        </a>
+    <?php endforeach; ?>
+</div>
+
+<div class="tabs-wrapper">
+    <?php foreach ($valid_sections_for_grade as $sec): ?>
+        <a href="?grade_level=<?php echo $selected_grade; ?>&section=<?php echo urlencode($sec); ?>&semester=<?php echo $selected_semester; ?>" 
+           class="tab-link <?php echo $selected_section == $sec ? 'active' : ''; ?>">
+            Section <?php echo htmlspecialchars($sec); ?>
+        </a>
+    <?php endforeach; ?>
+    <?php if (empty($allowed_grades)): ?>
+        <p style="color: #f87171; font-weight: 500;">No assigned grade configurations mapped to your profile.</p>
     <?php endif; ?>
+</div>
 
-    <?php if (empty($students)): ?>
-        <div class="record-container" style="text-align: center; padding: 50px;">
-            <h3>No students found in section <?php echo htmlspecialchars($selected_section); ?>.</h3>
-        </div>
-    <?php else: ?>
+<div class="card-panel toolbar-panel">
+    <form method="GET" style="display: flex; align-items: center; gap: 10px;">
+        <input type="hidden" name="grade_level" value="<?php echo $selected_grade; ?>">
+        <input type="hidden" name="section" value="<?php echo htmlspecialchars($selected_section); ?>">
+        <label style="font-weight: 600; color: var(--text-muted); font-size: 13px;">Active Term:</label>
+        <select name="semester" onchange="this.form.submit()" style="padding: 8px 12px;">
+            <option value="1" <?php echo $selected_semester == 1 ? 'selected' : ''; ?>>1st Quarter</option>
+            <option value="2" <?php echo $selected_semester == 2 ? 'selected' : ''; ?>>2nd Quarter</option>
+            <option value="3" <?php echo $selected_semester == 3 ? 'selected' : ''; ?>>3rd Quarter</option>
+            <option value="4" <?php echo $selected_semester == 4 ? 'selected' : ''; ?>>4th Quarter</option>
+        </select>
+    </form>
+    <?php if (!empty($all_students)): ?>
+        <button type="submit" form="classRecordForm" name="save_grades" class="save-btn">💾 Save All Grades</button>
+    <?php endif; ?>
+</div>
 
-    <div class="record-container">
-
+<?php if (empty($all_students)): ?>
+    <div class="card-panel" style="text-align: center; padding: 40px; color: var(--text-muted);">
+        <h3>No student profiles tracked inside Grade <?php echo $selected_grade; ?> - Section: <?php echo htmlspecialchars($selected_section ?: 'None'); ?></h3>
+    </div>
+<?php else: ?>
+    <div class="card-panel" style="padding: 20px;">
         <form method="POST" action="" id="classRecordForm">
-            <table>
-                <thead>
-                    <tr>
-                        <th colspan="2" rowspan="2" class="bg-blue">LEARNERS' NAMES</th>
-                        <th colspan="<?php echo count($written) + 3; ?>" class="bg-magenta">WRITTEN WORKS (20%)</th>
-                        <th colspan="<?php echo count($performance) + 3; ?>" class="bg-yellow">PERFORMANCE TASKS (50%)</th>
-                        <th colspan="<?php echo count($exams) + 3; ?>" class="bg-green">SUMMATIVE TESTS (30%)</th>
-                        <th rowspan="2" class="bg-blue">Initial<br>Grade</th>
-                        <th rowspan="2" class="bg-magenta">Term<br>Grade</th>
-                        <th rowspan="2" class="bg-blue">Descriptor</th>
-                    </tr>
-                    <tr>
-                        <?php $i=1; foreach($written as $w): ?><th><?php echo $i++; ?></th><?php endforeach; ?>
-                        <th>Total</th><th>PS</th><th>WS</th>
-                        
-                        <?php $i=1; foreach($performance as $p): ?><th><?php echo $i++; ?></th><?php endforeach; ?>
-                        <th>Total</th><th>PS</th><th>WS</th>
-                        
-                        <?php $i=1; foreach($exams as $e): ?><th><?php echo $i++; ?></th><?php endforeach; ?>
-                        <th>Total</th><th>PS</th><th>WS</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php 
-                        $hps_ww_total = array_sum($written_max);
-                        $hps_pt_total = array_sum($performance_max);
-                        $hps_st_total = array_sum($exams_max);
-                    ?>
-                    
-                    <tr style="background-color: #fef9e6;">
-                        <td colspan="2" class="text-left" style="font-size: 10px; font-weight: bold;">Highest Possible Score</td>
-                        
-                        <?php foreach($written as $w): ?>
-                            <td><input type="number" name="max_score[<?php echo $w['id']; ?>]" value="<?php echo htmlspecialchars($w['max_score']); ?>" step="1"></td>
-                        <?php endforeach; ?>
-                        <td class="calculated-cell"><?php echo $hps_ww_total; ?></td><td class="calculated-cell">100.00</td><td class="calculated-cell">20%</td>
-                        
-                        <?php foreach($performance as $p): ?>
-                            <td><input type="number" name="max_score[<?php echo $p['id']; ?>]" value="<?php echo htmlspecialchars($p['max_score']); ?>" step="1"></td>
-                        <?php endforeach; ?>
-                        <td class="calculated-cell"><?php echo $hps_pt_total; ?></td><td class="calculated-cell">100.00</td><td class="calculated-cell">50%</td>
-                        
-                        <?php foreach($exams as $e): ?>
-                            <td><input type="number" name="max_score[<?php echo $e['id']; ?>]" value="<?php echo htmlspecialchars($e['max_score']); ?>" step="1"></td>
-                        <?php endforeach; ?>
-                        <td class="calculated-cell"><?php echo $hps_st_total; ?></td><td class="calculated-cell">100.00</td><td class="calculated-cell">30%</td>
-                        
-                        <td class="calculated-cell"></td><td class="calculated-cell"></td><td class="calculated-cell"></td>
-                    </tr>
+            <div class="deped-table-container">
+                <table class="deped-grade-table">
+                    <thead>
+                        <tr>
+                            <th colspan="2" rowspan="2" class="th-blue">LEARNERS' NAMES</th>
+                            <th colspan="<?php echo count($written) + 3; ?>" class="th-magenta">WRITTEN WORKS (20%)</th>
+                            <th colspan="<?php echo count($performance) + 3; ?>" class="th-yellow">PERFORMANCE TASKS (50%)</th>
+                            <th colspan="<?php echo count($exams) + 3; ?>" class="th-green">SUMMATIVE TESTS (30%)</th>
+                            <th rowspan="2" class="th-blue">Initial</th>
+                            <th rowspan="2" class="th-magenta">Term</th>
+                            <th rowspan="2" class="th-blue">Descriptor</th>
+                        </tr>
+                        <tr>
+                            <?php $i=1; foreach($written as $w): ?><th>W<?php echo $i++; ?></th><?php endforeach; ?>
+                            <th>Total</th><th>PS</th><th>WS</th>
+                            
+                            <?php $i=1; foreach($performance as $p): ?><th>P<?php echo $i++; ?></th><?php endforeach; ?>
+                            <th>Total</th><th>PS</th><th>WS</th>
+                            
+                            <?php $i=1; foreach($exams as $e): ?><th>Q<?php echo $i++; ?></th><?php endforeach; ?>
+                            <th>Total</th><th>PS</th><th>WS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php 
+                            $hps_ww_total = array_sum($written_max);
+                            $hps_pt_total = array_sum($performance_max);
+                            $hps_st_total = array_sum($exams_max);
+                        ?>
+                        <tr class="row-hps">
+                            <td colspan="2" style="text-align: left; font-weight: bold; color: var(--text-title); padding-left: 12px;">Highest Possible Score</td>
+                            
+                            <?php foreach($written as $w): ?>
+                                <td><input type="number" name="max_score[<?php echo $w['id']; ?>]" value="<?php echo htmlspecialchars($w['max_score']); ?>" step="1"></td>
+                            <?php endforeach; ?>
+                            <td class="cell-calc"><?php echo $hps_ww_total; ?></td><td class="cell-calc">100.00</td><td class="cell-calc">20%</td>
+                            
+                            <?php foreach($performance as $p): ?>
+                                <td><input type="number" name="max_score[<?php echo $p['id']; ?>]" value="<?php echo htmlspecialchars($p['max_score']); ?>" step="1"></td>
+                            <?php endforeach; ?>
+                            <td class="cell-calc"><?php echo $hps_pt_total; ?></td><td class="cell-calc">100.00</td><td class="cell-calc">50%</td>
+                            
+                            <?php foreach($exams as $e): ?>
+                                <td><input type="number" name="max_score[<?php echo $e['id']; ?>]" value="<?php echo htmlspecialchars($e['max_score']); ?>" step="1"></td>
+                            <?php endforeach; ?>
+                            <td class="cell-calc"><?php echo $hps_st_total; ?></td><td class="cell-calc">100.00</td><td class="cell-calc">30%</td>
+                            
+                            <td class="cell-calc"></td><td class="cell-calc"></td><td class="cell-calc"></td>
+                        </tr>
 
+                        <tr class="gender-header-row">
+                            <td colspan="<?php echo count($assignments) + 14; ?>" style="padding-left: 12px; text-align: left;">MALE</td>
+                        </tr>
 
-                    <?php foreach ($students as $student): 
-                        $sid = $student['id'];
-                        $data = $student_data[$sid];
-                        $warning = ($data['initial_grade'] > 0 && $data['initial_grade'] < 75) ? 'warning-cell' : '';
-                    ?>
-                    <tr class="bg-white">
-                        <td style="font-weight: bold; width: 30px;"><?php echo htmlspecialchars($student['student_id'] ?? $sid); ?></td>
-                        <td class="text-left" style="width: 200px; font-weight: bold;"><?php echo htmlspecialchars($student['name']); ?></td>
-                        
-                        <?php foreach($written as $w): ?>
-                            <td><input type="number" name="score[<?php echo $sid; ?>][<?php echo $w['id']; ?>]" value="<?php echo htmlspecialchars($data['ww_scores'][$w['id']]); ?>" step="0.5"></td>
-                        <?php endforeach; ?>
-                        <td class="calculated-cell"><?php echo number_format($data['ww_calc']['total'], 1); ?></td>
-                        <td class="calculated-cell"><?php echo number_format($data['ww_calc']['ps'], 2); ?></td>
-                        <td class="calculated-cell"><?php echo number_format($data['ww_calc']['ws'], 2); ?></td>
-                        
-                        <?php foreach($performance as $p): ?>
-                            <td><input type="number" name="score[<?php echo $sid; ?>][<?php echo $p['id']; ?>]" value="<?php echo htmlspecialchars($data['pt_scores'][$p['id']]); ?>" step="0.5"></td>
-                        <?php endforeach; ?>
-                        <td class="calculated-cell"><?php echo number_format($data['pt_calc']['total'], 1); ?></td>
-                        <td class="calculated-cell"><?php echo number_format($data['pt_calc']['ps'], 2); ?></td>
-                        <td class="calculated-cell"><?php echo number_format($data['pt_calc']['ws'], 2); ?></td>
-                        
-                        <?php foreach($exams as $e): ?>
-                            <td><input type="number" name="score[<?php echo $sid; ?>][<?php echo $e['id']; ?>]" value="<?php echo htmlspecialchars($data['st_scores'][$e['id']]); ?>" step="0.5"></td>
-                        <?php endforeach; ?>
-                        <td class="calculated-cell"><?php echo number_format($data['st_calc']['total'], 1); ?></td>
-                        <td class="calculated-cell"><?php echo number_format($data['st_calc']['ps'], 2); ?></td>
-                        <td class="calculated-cell"><?php echo number_format($data['st_calc']['ws'], 2); ?></td>
-                        
-                        <td class="calculated-cell <?php echo $warning; ?>"><?php echo ($data['initial_grade'] > 0) ? number_format($data['initial_grade'], 2) : ''; ?></td>
-                        <td class="text-red"><?php echo ($data['term_grade'] > 0) ? $data['term_grade'] : ''; ?></td>
-                        <td class="text-red" style="font-size: 11px;"><?php echo $data['descriptor']; ?></td>
-                    </tr>
-                    <?php endforeach; ?>
-                    
-                </tbody>
-            </table>
-            
+                        <?php if (empty($students_male)): ?>
+                            <tr><td colspan="<?php echo count($assignments) + 14; ?>" style="color: var(--text-muted); padding: 10px;">No male student records registered in this section.</td></tr>
+                        <?php else: ?>
+                            <?php foreach ($students_male as $student): 
+                                $sid = $student['id'];
+                                $data = $student_data[$sid];
+                                $warning = ($data['initial_grade'] > 0 && $data['initial_grade'] < 75) ? 'cell-warning' : '';
+                            ?>
+                            <tr>
+                                <td style="font-weight: 600; width: 40px; color: var(--text-muted);"><?php echo htmlspecialchars($student['student_id'] ?? $sid); ?></td>
+                                <td style="text-align: left; min-width: 180px; font-weight: 600; padding-left: 12px; border-right: 2px solid var(--border-card);"><?php echo htmlspecialchars($student['name']); ?></td>
+                                
+                                <?php foreach($written as $w): ?>
+                                    <td><input type="number" name="score[<?php echo $sid; ?>][<?php echo $w['id']; ?>]" value="<?php echo htmlspecialchars($data['ww_scores'][$w['id']] ?? ''); ?>" step="0.5"></td>
+                                <?php endforeach; ?>
+                                <td class="cell-calc"><?php echo number_format($data['ww_calc']['total'], 1); ?></td>
+                                <td class="cell-calc"><?php echo number_format($data['ww_calc']['ps'], 2); ?></td>
+                                <td class="cell-calc" style="border-right: 2px solid var(--border-card);"><?php echo number_format($data['ww_calc']['ws'], 2); ?></td>
+                                
+                                <?php foreach($performance as $p): ?>
+                                    <td><input type="number" name="score[<?php echo $sid; ?>][<?php echo $p['id']; ?>]" value="<?php echo htmlspecialchars($data['pt_scores'][$p['id']] ?? ''); ?>" step="0.5"></td>
+                                <?php endforeach; ?>
+                                <td class="cell-calc"><?php echo number_format($data['pt_calc']['total'], 1); ?></td>
+                                <td class="cell-calc"><?php echo number_format($data['pt_calc']['ps'], 2); ?></td>
+                                <td class="cell-calc" style="border-right: 2px solid var(--border-card);"><?php echo number_format($data['pt_calc']['ws'], 2); ?></td>
+                                
+                                <?php foreach($exams as $e): ?>
+                                    <td><input type="number" name="score[<?php echo $sid; ?>][<?php echo $e['id']; ?>]" value="<?php echo htmlspecialchars($data['st_scores'][$e['id']] ?? ''); ?>" step="0.5"></td>
+                                <?php endforeach; ?>
+                                <td class="cell-calc"><?php echo number_format($data['st_calc']['total'], 1); ?></td>
+                                <td class="cell-calc"><?php echo number_format($data['st_calc']['ps'], 2); ?></td>
+                                <td class="cell-calc" style="border-right: 2px solid var(--border-card);"><?php echo number_format($data['st_calc']['ws'], 2); ?></td>
+                                
+                                <td class="cell-calc <?php echo $warning; ?>"><?php echo ($data['initial_grade'] > 0) ? number_format($data['initial_grade'], 2) : '0.00'; ?></td>
+                                <td class="text-highlight"><?php echo ($data['term_grade'] > 0) ? $data['term_grade'] : '60'; ?></td>
+                                <td style="font-size: 11px; font-weight: 500; color: var(--text-muted); text-align: left; padding-left: 6px;"><?php echo $data['descriptor'] ?: 'Did Not Meet Expectations'; ?></td>
+                            </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+
+                        <tr class="gender-header-row">
+                            <td colspan="<?php echo count($assignments) + 14; ?>" style="padding-left: 12px; text-align: left;">FEMALE</td>
+                        </tr>
+
+                        <?php if (empty($students_female)): ?>
+                            <tr><td colspan="<?php echo count($assignments) + 14; ?>" style="color: var(--text-muted); padding: 10px;">No female student records registered in this section.</td></tr>
+                        <?php else: ?>
+                            <?php foreach ($students_female as $student): 
+                                $sid = $student['id'];
+                                $data = $student_data[$sid];
+                                $warning = ($data['initial_grade'] > 0 && $data['initial_grade'] < 75) ? 'cell-warning' : '';
+                            ?>
+                            <tr>
+                                <td style="font-weight: 600; width: 40px; color: var(--text-muted);"><?php echo htmlspecialchars($student['student_id'] ?? $sid); ?></td>
+                                <td style="text-align: left; min-width: 180px; font-weight: 600; padding-left: 12px; border-right: 2px solid var(--border-card);"><?php echo htmlspecialchars($student['name']); ?></td>
+                                
+                                <?php foreach($written as $w): ?>
+                                    <td><input type="number" name="score[<?php echo $sid; ?>][<?php echo $w['id']; ?>]" value="<?php echo htmlspecialchars($data['ww_scores'][$w['id']] ?? ''); ?>" step="0.5"></td>
+                                <?php endforeach; ?>
+                                <td class="cell-calc"><?php echo number_format($data['ww_calc']['total'], 1); ?></td>
+                                <td class="cell-calc"><?php echo number_format($data['ww_calc']['ps'], 2); ?></td>
+                                <td class="cell-calc" style="border-right: 2px solid var(--border-card);"><?php echo number_format($data['ww_calc']['ws'], 2); ?></td>
+                                
+                                <?php foreach($performance as $p): ?>
+                                    <td><input type="number" name="score[<?php echo $sid; ?>][<?php echo $p['id']; ?>]" value="<?php echo htmlspecialchars($data['pt_scores'][$p['id']] ?? ''); ?>" step="0.5"></td>
+                                <?php endforeach; ?>
+                                <td class="cell-calc"><?php echo number_format($data['pt_calc']['total'], 1); ?></td>
+                                <td class="cell-calc"><?php echo number_format($data['pt_calc']['ps'], 2); ?></td>
+                                <td class="cell-calc" style="border-right: 2px solid var(--border-card);"><?php echo number_format($data['pt_calc']['ws'], 2); ?></td>
+                                
+                                <?php foreach($exams as $e): ?>
+                                    <td><input type="number" name="score[<?php echo $sid; ?>][<?php echo $e['id']; ?>]" value="<?php echo htmlspecialchars($data['st_scores'][$e['id']] ?? ''); ?>" step="0.5"></td>
+                                <?php endforeach; ?>
+                                <td class="cell-calc"><?php echo number_format($data['st_calc']['total'], 1); ?></td>
+                                <td class="cell-calc"><?php echo number_format($data['st_calc']['ps'], 2); ?></td>
+                                <td class="cell-calc" style="border-right: 2px solid var(--border-card);"><?php echo number_format($data['st_calc']['ws'], 2); ?></td>
+                                
+                                <td class="cell-calc <?php echo $warning; ?>"><?php echo ($data['initial_grade'] > 0) ? number_format($data['initial_grade'], 2) : '0.00'; ?></td>
+                                <td class="text-highlight"><?php echo ($data['term_grade'] > 0) ? $data['term_grade'] : '60'; ?></td>
+                                <td style="font-size: 11px; font-weight: 500; color: var(--text-muted); text-align: left; padding-left: 6px;"><?php echo $data['descriptor'] ?: 'Did Not Meet Expectations'; ?></td>
+                            </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+            <input type="hidden" name="save_grades" value="1">
         </form>
     </div>
-    <?php endif; ?>
+<?php endif; ?>
 
-</body>
-</html>
+<?php require_once 'includes/footer.php'; ?>

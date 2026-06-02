@@ -2,9 +2,6 @@
 require_once 'includes/header.php';
 require_once 'config/config.php';
 
-// ============================================
-// ADDED DEPED CALCULATION LOGIC
-// ============================================
 function transmutate($initial_grade) {
     $score = round($initial_grade, 2);
     if ($score >= 100) return 100;
@@ -49,21 +46,24 @@ $school_year = isset($_GET['school_year']) ? $_GET['school_year'] : '2025-2026';
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 $search_results = [];
 
-// Search for students
 if (!empty($search)) {
     $like = "%$search%";
     $stmt = $pdo->prepare("
-        SELECT id, first_name, last_name, lrn, student_id, grade_level, section 
+        SELECT id, name, first_name, last_name, lrn, student_id, grade_level, section 
         FROM students 
-        WHERE first_name LIKE ? OR last_name LIKE ? OR lrn LIKE ? OR student_id LIKE ?
-        ORDER BY last_name, first_name
+        WHERE name LIKE ? 
+           OR first_name LIKE ? 
+           OR last_name LIKE ? 
+           OR lrn LIKE ? 
+           OR student_id LIKE ?
+        ORDER BY last_name ASC, first_name ASC
         LIMIT 20
     ");
-    $stmt->execute([$like, $like, $like, $like]);
+    
+    $stmt->execute([$like, $like, $like, $like, $like]);
     $search_results = $stmt->fetchAll();
 }
 
-// Get selected student data
 $student = null;
 $subject_grades = [];
 $general_average = 0;
@@ -87,7 +87,6 @@ if ($student_id > 0) {
             $stmt->execute([$student_id, $semester, $subject['id'], $semester]);
             $assignments = $stmt->fetchAll();
             
-            // Grouping by category for weighted calculation
             $cat_scores = ['written' => [], 'performance' => [], 'exam' => []];
             $cat_max = ['written' => [], 'performance' => [], 'exam' => []];
 
@@ -97,7 +96,6 @@ if ($student_id > 0) {
                 $cat_max[$cat][] = $a['max_score'];
             }
 
-            // Apply 20-50-30 Weights
             $ww_ws = calculateCategory($cat_scores['written'], $cat_max['written'], 0.20);
             $pt_ws = calculateCategory($cat_scores['performance'], $cat_max['performance'], 0.50);
             $st_ws = calculateCategory($cat_scores['exam'], $cat_max['exam'], 0.30);
@@ -127,302 +125,347 @@ if ($student_id > 0) {
 ?>
 
 <style>
-    body { font-family: Arial, sans-serif; }
-    .search-container { background: white; padding: 20px; border-radius: 5px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .search-box { display: flex; gap: 10px; align-items: center; }
-    .search-box input { flex: 1; padding: 10px; font-size: 14px; border: 1px solid #ccc; border-radius: 5px; }
-    .search-box button { padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
-    
-    .search-results { background: white; padding: 15px; border-radius: 5px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .result-item { padding: 8px; border-bottom: 1px solid #eee; }
-    .result-item a { text-decoration: none; color: #333; display: block; }
-    .result-item:hover { background: #f5f5f5; }
-    
-    .report-card { background: white; padding: 20px; border-radius: 5px; }
-    .student-info { margin-bottom: 20px; padding: 15px; background: #f9f9f9; border-radius: 5px; border: 1px solid #ddd; }
-    .toolbar { margin-bottom: 20px; background: white; padding: 10px 0; display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
-    .btn-print { background: #2196F3; color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 3px; font-weight: bold; }
-    
-    /* 2-Column Layout */
-    .report-card-body {
-        display: flex;
-        gap: 30px;
-        align-items: flex-start;
+    .search-container { background: rgba(255, 255, 255, 0.02); padding: 22px; border-radius: 12px; margin-bottom: 24px; border: 1px solid var(--border-card); }
+    .search-box { display: flex; gap: 12px; align-items: center; }
+    .search-box input { 
+        flex: 1; 
+        padding: 12px 16px; 
+        font-size: 14px; 
+        border: 1px solid var(--border-card); 
+        border-radius: 8px; 
+        background: var(--input-bg, #ffffff); 
+        color: var(--input-text, #1e293b); 
+        outline: none; 
     }
-    .report-column {
-        flex: 1;
-        min-width: 0;
+    .search-box input::placeholder {
+        color: var(--input-placeholder, #94a3b8);
+        opacity: 1;
     }
+    .search-box input:focus { border-color: var(--text-subtitle); }
+    .search-box button { padding: 12px 24px; background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
     
-    .header-text { 
-        font-weight: bold; 
-        text-transform: uppercase; 
-        text-align: center;
-        margin-bottom: 10px; 
-        font-size: 14px;
-    }
+    .search-results { background: rgba(255, 255, 255, 0.02); padding: 20px; border-radius: 12px; margin-bottom: 24px; border: 1px solid var(--border-card); }
+    .search-results h3 { font-size: 15px; color: var(--text-subtitle); margin-bottom: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .result-item { padding: 12px 16px; border: 1px solid var(--border-card); border-radius: 8px; margin-bottom: 8px; background: rgba(255, 255, 255, 0.01); transition: all 0.2s ease; }
+    .result-item a { text-decoration: none; color: var(--text-title); display: block; font-weight: 500; font-size: 14px; }
+    .result-item:hover { background: rgba(0, 180, 216, 0.08); border-color: var(--text-subtitle); }
     
-    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 12px; }
-    th, td { border: 1px solid black; padding: 6px; text-align: center; }
-    th { background-color: #fff; }
-    .text-left { text-align: left; padding-left: 10px; }
-    .text-center { text-align: center; }
+    .report-card { background: transparent; padding: 0; border-radius: 0; }
+    .toolbar { margin-bottom: 20px; background: rgba(255, 255, 255, 0.02); padding: 16px 20px; display: flex; gap: 20px; align-items: center; flex-wrap: wrap; border-radius: 12px; border: 1px solid var(--border-card); }
+    .toolbar label { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+    .toolbar select, .toolbar input[type="text"] { padding: 8px 12px; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-card); border-radius: 6px; color: white; font-size: 13px; outline: none; }
+    .toolbar select:focus, .toolbar input[type="text"]:focus { border-color: var(--text-subtitle); }
+    .btn-print { background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%); color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 6px; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; }
+    .btn-secondary { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border-card); }
+    .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
     
-    /* MAPEH Indentation */
-    .indented-subject { padding-left: 25px !important; }
+    .print-container { background: #ffffff; color: #000000; padding: 25px 30px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); max-width: 1140px; margin: 0 auto; }
+    .deped-header { text-align: center; margin-bottom: 15px; position: relative; border-bottom: 2px solid #000000; padding-bottom: 10px; }
+    .deped-header img { height: 55px; position: absolute; left: 15px; top: 0; }
+    .deped-header h2 { font-size: 13px; font-weight: 800; margin: 0; letter-spacing: 0.5px; line-height: 1.3; color: #000000; }
+    .deped-header p { font-size: 11px; margin: 2px 0 0 0; line-height: 1.3; color: #333333; }
+    .deped-header .school-title { font-size: 14px; font-weight: 800; color: #000000; margin-top: 2px; }
+    
+    .report-card-body { display: flex; gap: 30px; align-items: flex-start; margin-top: 15px; }
+    .report-column { flex: 1; min-width: 0; }
+    
+    .header-text { font-weight: 800; text-transform: uppercase; text-align: center; margin-bottom: 10px; font-size: 12px; color: #000000; letter-spacing: 0.5px; border-bottom: 1px solid #000000; padding-bottom: 4px; }
+    
+    .print-container table { width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 11px; background: transparent; }
+    .print-container th, .print-container td { border: 1px solid #000000; padding: 5px 4px; text-align: center; color: #000000; line-height: 1.2; }
+    .print-container th { background-color: #f5f5f5; font-weight: 700; text-transform: uppercase; font-size: 10px; }
+    .print-container .text-left { text-align: left; padding-left: 8px; }
+    .print-container .text-center { text-align: center; }
+    
+    .indented-subject { padding-left: 20px !important; font-style: italic; }
+    .remarks-badge-print { font-weight: 700; font-size: 10px; }
+    .remarks-badge-print.passed { color: #000000; }
+    .remarks-badge-print.failed { color: #000000; text-decoration: underline; }
 
-    /* Legends */
-    .legend-container {
-        display: flex;
-        justify-content: space-between;
-        font-size: 11px;
-        margin-top: -5px;
-    }
-    .legend-table {
-        width: auto;
-        margin: 0 auto;
-        border: none;
-    }
-    .legend-table th, .legend-table td {
-        border: none;
-        padding: 4px 15px;
-        text-align: left;
-    }
-    .legend-table th { font-weight: bold; padding-bottom: 8px; }
+    .legend-container { display: flex; justify-content: space-between; font-size: 10px; margin-top: 8px; border-top: 1px dashed #000000; padding-top: 8px; }
+    .legend-table { width: auto; margin: 0; border: none; }
+    .legend-table th, .legend-table td { border: none !important; padding: 2px 6px; text-align: left; color: #000000 !important; background: transparent !important; }
+    .legend-table th { font-weight: 700; padding-bottom: 4px; text-transform: uppercase; font-size: 9px; }
     
-    @media print { 
-        /* Removes browser headers/footers (URL, time, page num) */
-        @page { margin: 0; size: auto; }
-        
-        /* Hides any navigation from header.php */
-        nav, header, footer, .navbar, .no-print { display: none !important; } 
-        
-        body { padding: 20px; margin: 0; background: white; }
-        .report-card { padding: 0; box-shadow: none; }
-        .report-card-body { gap: 15px; }
-        th, td { padding: 4px; font-size: 10px; }
-        .header-text { font-size: 12px; }
-        .legend-container { font-size: 9px; }
+    @media print {
+    .header,
+    .ambient-glow-1,
+    .ambient-glow-2,
+    .no-print,
+    .search-container {
+        display: none !important;
     }
+    
+    body {
+        background: #ffffff;
+        color: #000000;
+        padding: 0;
+    }
+    
+    .container {
+        margin: 0;
+        padding: 0;
+        max-width: 100%;
+    }
+    
+    .card-panel, 
+    .report-card {
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+}
 </style>
 
-<h1 class="no-print">Report Card</h1>
+<h1 class="no-print">Performance Evaluation & Learner Portfolios</h1>
 
 <div class="search-container no-print">
     <form method="GET" class="search-box">
-        <input type="text" name="search" placeholder="Search by name, LRN, or Student ID..." value="<?php echo htmlspecialchars($search); ?>" autofocus>
-        <button type="submit">🔍 Search</button>
+        <input type="text" name="search" placeholder="Search by Last Name, or Student ID..." value="<?php echo htmlspecialchars($search); ?>" autofocus>
+        <button type="submit">Search Profile</button>
     </form>
 </div>
 
 <?php if (!empty($search) && !empty($search_results)): ?>
 <div class="search-results no-print">
-    <h3>Select a student:</h3>
-    <?php foreach ($search_results as $result): ?>
-        <div class="result-item">
-            <a href="?student_id=<?php echo $result['id']; ?>&semester=<?php echo $semester; ?>&school_year=<?php echo urlencode($school_year); ?>">
-                <?php echo htmlspecialchars($result['last_name'] . ', ' . $result['first_name']); ?> 
-                (<?php echo htmlspecialchars($result['lrn'] ?? 'N/A'); ?>) - Grade <?php echo $result['grade_level']; ?> - <?php echo htmlspecialchars($result['section'] ?? 'No Section'); ?>
-            </a>
-        </div>
-    <?php endforeach; ?>
+    <h3>Matching Student Records Found</h3>
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+        <?php foreach ($search_results as $result): 
+            $student_no = htmlspecialchars($result['student_id']);
+            $last = !empty($result['last_name']) ? htmlspecialchars($result['last_name']) : htmlspecialchars($result['name']);
+            $first = !empty($result['first_name']) ? htmlspecialchars($result['first_name']) : '';
+            $section = !empty($result['section']) ? htmlspecialchars($result['section']) : 'No Section';
+            
+            $full_name = $first ? "$last, $first" : $last;
+        ?>
+            <div class="result-item">
+                <a href="?student_id=<?php echo $result['id']; ?>&semester=<?php echo $semester; ?>&school_year=<?php echo urlencode($school_year); ?>">
+                    <?php echo $student_no; ?> - <?php echo $full_name; ?> - <?php echo $section; ?>
+                    <span style="float: right; font-size: 12px; background: rgba(0, 180, 216, 0.1); color: var(--text-subtitle); padding: 2px 8px; border-radius: 4px;">Grade <?php echo htmlspecialchars($result['grade_level']); ?></span>
+                </a>
+            </div>
+        <?php endforeach; ?>
+    </div>
 </div>
 <?php elseif (!empty($search) && empty($search_results)): ?>
 <div class="search-results no-print">
-    <p>No students found matching "<?php echo htmlspecialchars($search); ?>"</p>
+    <p style="color: var(--text-muted); font-size: 14px; margin: 0;">No matching student records found for "<?php echo htmlspecialchars($search); ?>".</p>
 </div>
 <?php endif; ?>
 
-<?php if ($student): ?>
+<?php if ($student): 
+    $student_display_name = (!empty($student['last_name']) && !empty($student['first_name'])) ? $student['last_name'] . ', ' . $student['first_name'] : $student['name'];
+?>
 <div class="report-card">
     <div class="toolbar no-print">
-        <form method="GET" style="display: inline;">
+        <form method="GET" style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap; flex: 1;">
             <input type="hidden" name="student_id" value="<?php echo $student_id; ?>">
-            <label>Semester:</label>
-            <select name="semester" onchange="this.form.submit()">
-                <option value="1" <?php echo $semester == 1 ? 'selected' : ''; ?>>1st Semester</option>
-                <option value="2" <?php echo $semester == 2 ? 'selected' : ''; ?>>2nd Semester</option>
-                <option value="3" <?php echo $semester == 3 ? 'selected' : ''; ?>>3rd Semester</option>
-            </select>
-            <label style="margin-left: 15px;">School Year:</label>
-            <input type="text" name="school_year" value="<?php echo htmlspecialchars($school_year); ?>" style="width: 100px;">
-            <button type="submit" class="btn-print" style="margin-left: 10px;">Load</button>
+            <div>
+                <label>Active Term:</label>
+                <select name="semester" onchange="this.form.submit()">
+                    <option value="1" <?php echo $semester == 1 ? 'selected' : ''; ?>>1st Semester</option>
+                    <option value="2" <?php echo $semester == 2 ? 'selected' : ''; ?>>2nd Semester</option>
+                    <option value="3" <?php echo $semester == 3 ? 'selected' : ''; ?>>3rd Semester</option>
+                </select>
+            </div>
+            <div>
+                <label>School Year:</label>
+                <input type="text" name="school_year" value="<?php echo htmlspecialchars($school_year); ?>">
+            </div>
+            <button type="submit" class="btn-print btn-secondary">Load Framework</button>
         </form>
         <button onclick="window.print()" class="btn-print">🖨️ Print Report Card</button>
     </div>
-    
-    <div class="student-info no-print">
-        <strong>Student:</strong> <?php echo htmlspecialchars($student['last_name'] . ', ' . $student['first_name']); ?> | 
-        <strong>LRN:</strong> <?php echo htmlspecialchars($student['lrn'] ?? '_________________'); ?> | 
-        <strong>Grade & Section:</strong> <?php echo $student['grade_level']; ?> - <?php echo htmlspecialchars($student['section'] ?? ''); ?> | 
-        <strong>School Year:</strong> <?php echo htmlspecialchars($school_year); ?>
-    </div>
-    
-    <div class="report-card-body">
+
+    <div class="print-container">
+        <div class="deped-header">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Department_of_Education_of_the_Philippines_Seal.svg/1200px-Department_of_Education_of_the_Philippines_Seal.svg.png" alt="DepEd Seal">
+            <h2>REPUBLIC OF THE PHILIPPINES<br>DEPARTMENT OF EDUCATION</h2>
+            <p>NATIONAL CAPITAL REGION &bull; DIVISION OF MANILA</p>
+            <p class="school-title">TIMOTEO PAEZ INTEGRATED HIGH SCHOOL</p>
+            <p style="font-size: 9px; color: #555555; font-style: italic;">139 Nepa St, Tondo, Manila, 1013 Metro Manila</p>
+            <div style="margin-top: 10px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Learner's Progress Report Card &bull; SY <?php echo htmlspecialchars($school_year); ?> (Semester <?php echo $semester; ?>)</div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 10px; border-bottom: 1px solid #000; padding-bottom: 6px;">
+            <div><strong>NAME:</strong> <?php echo htmlspecialchars($student_display_name); ?></div>
+            <div><strong>LRN:</strong> <?php echo htmlspecialchars($student['lrn'] ?? $student['']); ?></div>
+            <div><strong>GRADE & SECTION:</strong> Grade <?php echo $student['grade_level']; ?> - <?php echo htmlspecialchars($student['section'] ?? ''); ?></div>
+        </div>
         
-        <div class="report-column">
-            <div class="header-text">Report on Learning Progress and Achievement</div>
-            <table>
-                <thead>
-                    <tr>
-                        <th rowspan="2" style="width: 40%;">Learning Areas</th>
-                        <th colspan="3">Semester</th>
-                        <th rowspan="2" style="width: 15%;">Final Rating</th>
-                        <th rowspan="2" style="width: 15%;">Remarks</th>
-                    </tr>
-                    <tr>
-                        <th style="width: 10%;">1</th>
-                        <th style="width: 10%;">2</th>
-                        <th style="width: 10%;">3</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php 
-                    $mapeh_printed = false;
-                    foreach ($subject_grades as $sg): 
-                        $subject_name = trim($sg['name']);
-                        $is_mapeh_component = in_array($subject_name, ['Music', 'Arts', 'Physical Education', 'Health', 'P.E.', 'PE']);
-                        
-                        // Print MAPEH Header exactly once if a MAPEH component is detected
-                        if ($is_mapeh_component && !$mapeh_printed):
-                            $mapeh_printed = true;
-                    ?>
+        <div class="report-card-body">
+            <div class="report-column">
+                <div class="header-text">Report on Learning Progress and Achievement</div>
+                <table>
+                    <thead>
                         <tr>
-                            <td class="text-left" style="font-weight: bold;">MAPEH</td>
-                            <td style="background-color: #f2f2f2;"></td>
-                            <td style="background-color: #f2f2f2;"></td>
-                            <td style="background-color: #f2f2f2;"></td>
-                            <td style="background-color: #f2f2f2;"></td>
-                            <td style="background-color: #f2f2f2;"></td>
+                            <th rowspan="2" style="width: 45%;">Learning Areas</th>
+                            <th colspan="3">Semester Term Scores</th>
+                            <th rowspan="2" style="width: 15%;">Final Rating</th>
+                            <th rowspan="2" style="width: 15%;">Remarks</th>
                         </tr>
-                    <?php endif; ?>
-                    
-                    <tr>
-                        <td class="text-left <?php echo $is_mapeh_component ? 'indented-subject' : ''; ?>">
-                            <?php echo htmlspecialchars($subject_name); ?>
-                        </td>
-                        <td><?php echo ($semester == 1 && $sg['grade']) ? $sg['grade'] : ''; ?></td>
-                        <td><?php echo ($semester == 2 && $sg['grade']) ? $sg['grade'] : ''; ?></td>
-                        <td><?php echo ($semester == 3 && $sg['grade']) ? $sg['grade'] : ''; ?></td>
-                        <td><?php echo $sg['grade'] ?: ''; ?></td>
-                        <td><?php echo $sg['grade'] ? ($sg['passed'] ? 'Passed' : 'Failed') : ''; ?></td>
-                    </tr>
-                    <?php endforeach; ?>
-                    <tr style="font-weight: bold;">
-                        <td class="text-left" style="padding-top: 10px; padding-bottom: 10px;">General Average</td>
-                        <td colspan="3"></td>
-                        <td><?php echo $general_average > 0 ? $general_average : ''; ?></td>
-                        <td><?php echo $general_average > 0 ? $general_remarks : ''; ?></td>
-                    </tr>
-                </tbody>
-            </table>
-            
-            <div class="legend-container">
-                <table class="legend-table">
-                    <tr><th>Descriptors</th></tr>
-                    <tr><td>Outstanding</td></tr>
-                    <tr><td>Very Satisfactory</td></tr>
-                    <tr><td>Satisfactory</td></tr>
-                    <tr><td>Fairly Satisfactory</td></tr>
-                    <tr><td>Did Not Meet Expectations</td></tr>
+                        <tr>
+                            <th style="width: 8%;">1</th>
+                            <th style="width: 8%;">2</th>
+                            <th style="width: 8%;">3</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php 
+                        $mapeh_printed = false;
+                        foreach ($subject_grades as $sg): 
+                            $subject_name = trim($sg['name']);
+                            $is_mapeh_component = in_array($subject_name, ['Music', 'Arts', 'Physical Education', 'Health', 'P.E.', 'PE']);
+                            
+                            if ($is_mapeh_component && !$mapeh_printed):
+                                $mapeh_printed = true;
+                        ?>
+                            <tr style="font-weight: bold; background-color: #f9f9f9;">
+                                <td class="text-left">MAPEH</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        <?php endif; ?>
+                        
+                        <tr>
+                            <td class="text-left <?php echo $is_mapeh_component ? 'indented-subject' : ''; ?>">
+                                <?php echo htmlspecialchars($subject_name); ?>
+                            </td>
+                            <td><?php echo ($semester == 1 && $sg['grade']) ? $sg['grade'] : ''; ?></td>
+                            <td><?php echo ($semester == 2 && $sg['grade']) ? $sg['grade'] : ''; ?></td>
+                            <td><?php echo ($semester == 3 && $sg['grade']) ? $sg['grade'] : ''; ?></td>
+                            <td style="font-weight: 700;"><?php echo $sg['grade'] ?: ''; ?></td>
+                            <td>
+                                <?php if ($sg['grade']): ?>
+                                    <span class="remarks-badge-print <?php echo $sg['passed'] ? 'passed' : 'failed'; ?>">
+                                        <?php echo $sg['passed'] ? 'Passed' : 'Failed'; ?>
+                                    </span>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                        
+                        <tr style="font-weight: bold; background-color: #f5f5f5;">
+                            <td class="text-left" style="padding-top: 6px; padding-bottom: 6px;">GENERAL AVERAGE</td>
+                            <td colspan="3"></td>
+                            <td style="font-size: 12px; font-weight: 800;"><?php echo $general_average > 0 ? $general_average : ''; ?></td>
+                            <td style="text-transform: uppercase; font-weight: 800;"><?php echo $general_average > 0 ? $general_remarks : ''; ?></td>
+                        </tr>
+                    </tbody>
                 </table>
-                <table class="legend-table">
-                    <tr><th>Grading Scale</th></tr>
-                    <tr><td class="text-center">90-100</td></tr>
-                    <tr><td class="text-center">85-89</td></tr>
-                    <tr><td class="text-center">80-84</td></tr>
-                    <tr><td class="text-center">75-79</td></tr>
-                    <tr><td class="text-center">Below 75</td></tr>
-                </table>
-                <table class="legend-table">
-                    <tr><th>Remarks</th></tr>
-                    <tr><td class="text-center">Passed</td></tr>
-                    <tr><td class="text-center">Passed</td></tr>
-                    <tr><td class="text-center">Passed</td></tr>
-                    <tr><td class="text-center">Passed</td></tr>
-                    <tr><td class="text-center">Failed</td></tr>
-                </table>
+                
+                <div class="legend-container">
+                    <table class="legend-table">
+                        <tr><th>Descriptors</th></tr>
+                        <tr><td>Outstanding</td></tr>
+                        <tr><td>Very Satisfactory</td></tr>
+                        <tr><td>Satisfactory</td></tr>
+                        <tr><td>Fairly Satisfactory</td></tr>
+                        <tr><td>Did Not Meet Expectations</td></tr>
+                    </table>
+                    <table class="legend-table">
+                        <tr><th style="text-align: center;">Grading Scale</th></tr>
+                        <tr><td class="text-center">90 - 100</td></tr>
+                        <tr><td class="text-center">85 - 89</td></tr>
+                        <tr><td class="text-center">80 - 84</td></tr>
+                        <tr><td class="text-center">75 - 79</td></tr>
+                        <tr><td class="text-center">Below 75</td></tr>
+                    </table>
+                    <table class="legend-table">
+                        <tr><th style="text-align: center;">Remarks</th></tr>
+                        <tr><td class="text-center">Passed</td></tr>
+                        <tr><td class="text-center">Passed</td></tr>
+                        <tr><td class="text-center">Passed</td></tr>
+                        <tr><td class="text-center">Passed</td></tr>
+                        <tr><td class="text-center">Failed</td></tr>
+                    </table>
+                </div>
             </div>
-        </div>
 
-        <div class="report-column">
-            <div class="header-text">Report on Learner's Observed Values</div>
-            <table>
-                <thead>
-                    <tr>
-                        <th rowspan="2" style="width: 25%;">Core Values</th>
-                        <th rowspan="2" style="width: 45%;">Behavior Statements</th>
-                        <th colspan="3">Semester</th>
-                    </tr>
-                    <tr>
-                        <th style="width: 10%;">1</th>
-                        <th style="width: 10%;">2</th>
-                        <th style="width: 10%;">3</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td rowspan="2"><strong>1. Maka-Diyos</strong></td>
-                        <td class="text-left">Expresses one's spiritual beliefs while respecting the spiritual beliefs of others.</td>
-                        <td></td><td></td><td></td>
-                    </tr>
-                    <tr>
-                        <td class="text-left">Shows adherence to ethical principles by upholding truth in all undertakings.</td>
-                        <td></td><td></td><td></td>
-                    </tr>
-                    <tr>
-                        <td rowspan="2"><strong>2. Makatao</strong></td>
-                        <td class="text-left">Is sensitive to individual, social, and cultural differences;</td>
-                        <td></td><td></td><td></td>
-                    </tr>
-                    <tr>
-                        <td class="text-left">Demonstrates contributions towards solidarity.</td>
-                        <td></td><td></td><td></td>
-                    </tr>
-                    <tr>
-                        <td><strong>3. Maka-Kalikasan</strong></td>
-                        <td class="text-left">Cares for environment and utilizes resources wisely, judiciously and economically.</td>
-                        <td></td><td></td><td></td>
-                    </tr>
-                    <tr>
-                        <td rowspan="2"><strong>4. Maka-Bansa</strong></td>
-                        <td class="text-left">Demonstrates pride in being a Filipino; exercises the rights and responsibilities of a Filipino citizen.</td>
-                        <td></td><td></td><td></td>
-                    </tr>
-                    <tr>
-                        <td class="text-left">Demonstrate appropriate behavior in carrying out activities in school, community and country.</td>
-                        <td></td><td></td><td></td>
-                    </tr>
-                </tbody>
-            </table>
-            
-            <div class="legend-container" style="justify-content: center; margin-top: 15px;">
-                <table class="legend-table">
-                    <tr>
-                        <th style="text-align: center;">Marking</th>
-                        <th>Non-Numerical Rating</th>
-                    </tr>
-                    <tr>
-                        <td class="text-center">AO</td>
-                        <td>Always Observed</td>
-                    </tr>
-                    <tr>
-                        <td class="text-center">SO</td>
-                        <td>Sometimes Observed</td>
-                    </tr>
-                    <tr>
-                        <td class="text-center">RO</td>
-                        <td>Rarely Observed</td>
-                    </tr>
-                    <tr>
-                        <td class="text-center">NO</td>
-                        <td>Not Observed</td>
-                    </tr>
+            <div class="report-column">
+                <div class="header-text">Report on Learner's Observed Values</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th rowspan="2" style="width: 25%;">Core Values</th>
+                            <th rowspan="2" style="width: 50%;">Behavior Statements</th>
+                            <th colspan="3">Semester Term Mark</th>
+                        </tr>
+                        <tr>
+                            <th style="width: 8%;">1</th>
+                            <th style="width: 8%;">2</th>
+                            <th style="width: 8%;">3</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td rowspan="2" style="font-weight: bold; vertical-align: middle;">1. Maka-Diyos</td>
+                            <td class="text-left">Expresses one's spiritual beliefs while respecting the spiritual beliefs of others.</td>
+                            <td></td><td></td><td></td>
+                        </tr>
+                        <tr>
+                            <td class="text-left">Shows adherence to ethical principles by upholding truth in all undertakings.</td>
+                            <td></td><td></td><td></td>
+                        </tr>
+                        <tr>
+                            <td rowspan="2" style="font-weight: bold; vertical-align: middle;">2. Makatao</td>
+                            <td class="text-left">Is sensitive to individual, social, and cultural differences.</td>
+                            <td></td><td></td><td></td>
+                        </tr>
+                        <tr>
+                            <td class="text-left">Demonstrates contributions towards solidarity.</td>
+                            <td></td><td></td><td></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: bold; vertical-align: middle;">3. Maka-Kalikasan</td>
+                            <td class="text-left">Cares for environment and utilizes resources wisely, judiciously and economically.</td>
+                            <td></td><td></td><td></td>
+                        </tr>
+                        <tr>
+                            <td rowspan="2" style="font-weight: bold; vertical-align: middle;">4. Maka-Bansa</td>
+                            <td class="text-left">Demonstrates pride in being a Filipino; exercises the rights and responsibilities of a Filipino citizen.</td>
+                            <td></td><td></td><td></td>
+                        </tr>
+                        <tr>
+                            <td class="text-left">Demonstrate appropriate behavior in carrying out activities in school, community and country.</td>
+                            <td></td><td></td><td></td>
+                        </tr>
+                    </tbody>
                 </table>
+                
+                <div class="legend-container" style="justify-content: center;">
+                    <table class="legend-table">
+                        <tr>
+                            <th style="text-align: center;">Marking</th>
+                            <th>Non-Numerical Rating Alignment</th>
+                        </tr>
+                        <tr>
+                            <td class="text-center" style="font-weight: 700;">AO</td>
+                            <td>Always Observed</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center" style="font-weight: 700;">SO</td>
+                            <td>Sometimes Observed</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center" style="font-weight: 700;">RO</td>
+                            <td>Rarely Observed</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center" style="font-weight: 700;">NO</td>
+                            <td>Not Observed</td>
+                        </tr>
+                    </table>
+                </div>
             </div>
-        </div>
-
-    </div> </div>
+        </div> 
+    </div> 
+</div>
 <?php endif; ?>
 
 <?php require_once 'includes/footer.php'; ?>
