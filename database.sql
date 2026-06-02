@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 29, 2026 at 11:13 PM
+-- Generation Time: Jun 01, 2026 at 05:33 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -63,83 +63,39 @@ CREATE TABLE `assignments` (
 --
 
 INSERT INTO `assignments` (`id`, `name`, `type`, `category`, `max_score`, `weight`, `semester`, `subject_id`) VALUES
-(1, 'Quiz 1', 'quiz', 'written', 20, 4.00, 1, 1),
-(2, 'Quiz 2', 'quiz', 'written', 20, 4.00, 1, 1),
-(3, 'Quiz 3', 'quiz', 'written', 20, 4.00, 1, 1),
-(4, 'Quiz 4', 'quiz', 'written', 20, 4.00, 1, 1),
-(5, 'Activity 1', 'activity', 'performance', 20, 4.00, 1, 1),
-(6, 'Activity 2', 'activity', 'performance', 20, 4.00, 1, 1),
-(7, 'Activity 3', 'activity', 'performance', 20, 4.00, 1, 1),
-(8, 'Activity 4', 'activity', 'performance', 20, 4.00, 1, 1),
-(9, 'Written Work 1', 'written', 'written', 30, 4.00, 1, 1),
-(10, 'Written Work 2', 'written', 'written', 30, 4.00, 1, 1),
-(11, 'Quarterly Exam', 'exam', 'exam', 50, 20.00, 1, 1),
-(12, 'Written Work 1', 'quiz', 'written', 20, 4.00, 1, 1),
-(13, 'Written Work 2', 'quiz', 'written', 20, 4.00, 1, 1),
-(14, 'Written Work 3', 'quiz', 'written', 20, 4.00, 1, 1),
-(15, 'Written Work 4', 'quiz', 'written', 20, 4.00, 1, 1),
-(16, 'Written Work 5', 'quiz', 'written', 20, 4.00, 1, 1),
-(17, 'Written Work 6', 'quiz', 'written', 20, 4.00, 1, 1),
-(18, 'Written Work 7', 'quiz', 'written', 20, 4.00, 1, 1),
-(19, 'Written Work 8', 'quiz', 'written', 20, 4.00, 1, 1),
-(20, 'Written Work 9', 'quiz', 'written', 20, 4.00, 1, 1),
-(21, 'Written Work 10', 'quiz', 'written', 20, 4.00, 1, 1),
-(22, 'Performance Task 1', 'quiz', 'performance', 20, 4.00, 1, 1),
-(23, 'Performance Task 2', 'quiz', 'performance', 20, 4.00, 1, 1),
-(24, 'Performance Task 3', 'quiz', 'performance', 20, 4.00, 1, 1),
-(25, 'Performance Task 4', 'quiz', 'performance', 20, 4.00, 1, 1),
-(26, 'Performance Task 5', 'quiz', 'performance', 20, 4.00, 1, 1),
-(27, 'Performance Task 6', 'quiz', 'performance', 20, 4.00, 1, 1),
-(28, 'Performance Task 7', 'quiz', 'performance', 20, 4.00, 1, 1),
-(29, 'Performance Task 8', 'quiz', 'performance', 20, 4.00, 1, 1),
-(30, 'Performance Task 9', 'quiz', 'performance', 20, 4.00, 1, 1),
-(31, 'Performance Task 10', 'quiz', 'performance', 20, 4.00, 1, 1),
-(32, 'Quarterly Assessment 1', 'quiz', 'exam', 50, 10.00, 1, 1),
-(33, 'Quarterly Assessment 2', 'quiz', 'exam', 50, 10.00, 1, 1),
-(34, 'Written Work 1', 'quiz', 'written', 20, 4.00, 2, 1),
-(35, 'Written Work 2', 'quiz', 'written', 20, 4.00, 2, 1),
-(36, 'Written Work 3', 'quiz', 'written', 20, 4.00, 2, 1),
-(37, 'Written Work 4', 'quiz', 'written', 20, 4.00, 2, 1),
-(38, 'Written Work 5', 'quiz', 'written', 20, 4.00, 2, 1),
-(39, 'Written Work 6', 'quiz', 'written', 20, 4.00, 2, 1),
-(40, 'Written Work 7', 'quiz', 'written', 20, 4.00, 2, 1),
-(41, 'Written Work 8', 'quiz', 'written', 20, 4.00, 2, 1),
-(42, 'Written Work 9', 'quiz', 'written', 20, 4.00, 2, 1),
-(43, 'Written Work 10', 'quiz', 'written', 20, 4.00, 2, 1),
-(44, 'Performance Task 1', 'quiz', 'performance', 20, 4.00, 2, 1),
-(45, 'Performance Task 2', 'quiz', 'performance', 20, 4.00, 2, 1),
-(46, 'Performance Task 3', 'quiz', 'performance', 20, 4.00, 2, 1),
-(47, 'Performance Task 4', 'quiz', 'performance', 20, 4.00, 2, 1),
-(48, 'Performance Task 5', 'quiz', 'performance', 20, 4.00, 2, 1),
-(49, 'Performance Task 6', 'quiz', 'performance', 20, 4.00, 2, 1),
-(50, 'Performance Task 7', 'quiz', 'performance', 20, 4.00, 2, 1),
-(51, 'Performance Task 8', 'quiz', 'performance', 20, 4.00, 2, 1),
-(52, 'Performance Task 9', 'quiz', 'performance', 20, 4.00, 2, 1),
-(53, 'Performance Task 10', 'quiz', 'performance', 20, 4.00, 2, 1),
-(54, 'Quarterly Assessment 1', 'quiz', 'exam', 100, 10.00, 2, 1),
-(55, 'Quarterly Assessment 2', 'quiz', 'exam', 100, 10.00, 2, 1),
-(56, 'Written Work 1', 'quiz', 'written', 20, 4.00, 3, 1),
-(57, 'Written Work 2', 'quiz', 'written', 20, 4.00, 3, 1),
-(58, 'Written Work 3', 'quiz', 'written', 20, 4.00, 3, 1),
-(59, 'Written Work 4', 'quiz', 'written', 20, 4.00, 3, 1),
-(60, 'Written Work 5', 'quiz', 'written', 20, 4.00, 3, 1),
-(61, 'Written Work 6', 'quiz', 'written', 20, 4.00, 3, 1),
-(62, 'Written Work 7', 'quiz', 'written', 20, 4.00, 3, 1),
-(63, 'Written Work 8', 'quiz', 'written', 20, 4.00, 3, 1),
-(64, 'Written Work 9', 'quiz', 'written', 20, 4.00, 3, 1),
-(65, 'Written Work 10', 'quiz', 'written', 20, 4.00, 3, 1),
-(66, 'Performance Task 1', 'quiz', 'performance', 20, 4.00, 3, 1),
-(67, 'Performance Task 2', 'quiz', 'performance', 20, 4.00, 3, 1),
-(68, 'Performance Task 3', 'quiz', 'performance', 20, 4.00, 3, 1),
-(69, 'Performance Task 4', 'quiz', 'performance', 20, 4.00, 3, 1),
-(70, 'Performance Task 5', 'quiz', 'performance', 20, 4.00, 3, 1),
-(71, 'Performance Task 6', 'quiz', 'performance', 20, 4.00, 3, 1),
-(72, 'Performance Task 7', 'quiz', 'performance', 20, 4.00, 3, 1),
-(73, 'Performance Task 8', 'quiz', 'performance', 20, 4.00, 3, 1),
-(74, 'Performance Task 9', 'quiz', 'performance', 20, 4.00, 3, 1),
-(75, 'Performance Task 10', 'quiz', 'performance', 20, 4.00, 3, 1),
-(76, 'Quarterly Assessment 1', 'quiz', 'exam', 100, 10.00, 3, 1),
-(77, 'Quarterly Assessment 2', 'quiz', 'exam', 100, 10.00, 3, 1);
+(78, 'WW1', 'quiz', 'written', 10, 4.00, 1, 1),
+(79, 'WW2', 'quiz', 'written', 15, 4.00, 1, 1),
+(80, 'WW3', 'quiz', 'written', 15, 4.00, 1, 1),
+(81, 'WW4', 'quiz', 'written', 10, 4.00, 1, 1),
+(82, 'WW5', 'quiz', 'written', 15, 4.00, 1, 1),
+(83, 'PT1', 'quiz', 'performance', 100, 16.67, 1, 1),
+(84, 'PT2', 'quiz', 'performance', 100, 16.67, 1, 1),
+(85, 'PT3', 'quiz', 'performance', 100, 16.66, 1, 1),
+(86, 'ST1', 'quiz', 'exam', 50, 10.00, 1, 1),
+(87, 'ST2', 'quiz', 'exam', 50, 10.00, 1, 1),
+(88, 'TE', 'quiz', 'exam', 50, 10.00, 1, 1),
+(89, 'WW1', 'quiz', 'written', 10, 4.00, 2, 1),
+(90, 'WW2', 'quiz', 'written', 15, 4.00, 2, 1),
+(91, 'WW3', 'quiz', 'written', 15, 4.00, 2, 1),
+(92, 'WW4', 'quiz', 'written', 10, 4.00, 2, 1),
+(93, 'WW5', 'quiz', 'written', 15, 4.00, 2, 1),
+(94, 'PT1', 'quiz', 'performance', 100, 16.67, 2, 1),
+(95, 'PT2', 'quiz', 'performance', 100, 16.67, 2, 1),
+(96, 'PT3', 'quiz', 'performance', 100, 16.66, 2, 1),
+(97, 'ST1', 'quiz', 'exam', 50, 10.00, 2, 1),
+(98, 'ST2', 'quiz', 'exam', 50, 10.00, 2, 1),
+(99, 'TE', 'quiz', 'exam', 50, 10.00, 2, 1),
+(100, 'WW1', 'quiz', 'written', 10, 4.00, 3, 1),
+(101, 'WW2', 'quiz', 'written', 15, 4.00, 3, 1),
+(102, 'WW3', 'quiz', 'written', 15, 4.00, 3, 1),
+(103, 'WW4', 'quiz', 'written', 10, 4.00, 3, 1),
+(104, 'WW5', 'quiz', 'written', 15, 4.00, 3, 1),
+(105, 'PT1', 'quiz', 'performance', 100, 16.67, 3, 1),
+(106, 'PT2', 'quiz', 'performance', 100, 16.67, 3, 1),
+(107, 'PT3', 'quiz', 'performance', 100, 16.66, 3, 1),
+(108, 'ST1', 'quiz', 'exam', 50, 10.00, 3, 1),
+(109, 'ST2', 'quiz', 'exam', 50, 10.00, 3, 1),
+(110, 'TE', 'quiz', 'exam', 50, 10.00, 3, 1);
 
 -- --------------------------------------------------------
 
@@ -154,6 +110,23 @@ CREATE TABLE `audit_log` (
   `details` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `audit_log`
+--
+
+INSERT INTO `audit_log` (`id`, `user_id`, `action`, `details`, `created_at`) VALUES
+(1, 8, 'UPDATE_SCORE', 'Student 7, Assignment 78, Semester 1: score changed from NULL to 10', '2026-06-01 05:40:01'),
+(2, 8, 'UPDATE_SCORE', 'Student 7, Assignment 79, Semester 1: score changed from NULL to 10', '2026-06-01 05:40:01'),
+(3, 8, 'UPDATE_SCORE', 'Student 7, Assignment 80, Semester 1: score changed from NULL to 10', '2026-06-01 05:40:01'),
+(4, 8, 'UPDATE_SCORE', 'Student 7, Assignment 81, Semester 1: score changed from NULL to 10', '2026-06-01 05:40:01'),
+(5, 8, 'UPDATE_SCORE', 'Student 7, Assignment 82, Semester 1: score changed from NULL to 10', '2026-06-01 05:40:01'),
+(6, 8, 'UPDATE_SCORE', 'Student 7, Assignment 83, Semester 1: score changed from NULL to 90', '2026-06-01 05:40:01'),
+(7, 8, 'UPDATE_SCORE', 'Student 7, Assignment 84, Semester 1: score changed from NULL to 90', '2026-06-01 05:40:01'),
+(8, 8, 'UPDATE_SCORE', 'Student 7, Assignment 85, Semester 1: score changed from NULL to 90', '2026-06-01 05:40:01'),
+(9, 8, 'UPDATE_SCORE', 'Student 7, Assignment 86, Semester 1: score changed from NULL to 40', '2026-06-01 05:40:01'),
+(10, 8, 'UPDATE_SCORE', 'Student 7, Assignment 87, Semester 1: score changed from NULL to 40', '2026-06-01 05:40:01'),
+(11, 8, 'UPDATE_SCORE', 'Student 7, Assignment 88, Semester 1: score changed from NULL to 40', '2026-06-01 05:40:01');
 
 -- --------------------------------------------------------
 
@@ -198,171 +171,17 @@ CREATE TABLE `scores` (
 --
 
 INSERT INTO `scores` (`id`, `student_id`, `assignment_id`, `score`, `semester`, `school_year`) VALUES
-(1, 6, 1, 20.00, 1, NULL),
-(4, 6, 2, 20.00, 1, NULL),
-(5, 6, 3, 20.00, 1, NULL),
-(6, 6, 4, 20.00, 1, NULL),
-(7, 6, 9, 20.00, 1, NULL),
-(8, 6, 10, 20.00, 1, NULL),
-(9, 6, 12, 20.00, 1, NULL),
-(10, 6, 13, 20.00, 1, NULL),
-(11, 6, 14, 20.00, 1, NULL),
-(12, 6, 15, 20.00, 1, NULL),
-(13, 6, 16, 20.00, 1, NULL),
-(14, 6, 17, 20.00, 1, NULL),
-(15, 6, 18, 20.00, 1, NULL),
-(16, 6, 19, 20.00, 1, NULL),
-(17, 6, 20, 20.00, 1, NULL),
-(18, 6, 21, 20.00, 1, NULL),
-(19, 6, 5, 20.00, 1, NULL),
-(20, 6, 6, 20.00, 1, NULL),
-(21, 6, 7, 20.00, 1, NULL),
-(22, 6, 8, 20.00, 1, NULL),
-(23, 6, 22, 20.00, 1, NULL),
-(24, 6, 23, 20.00, 1, NULL),
-(25, 6, 24, 20.00, 1, NULL),
-(26, 6, 25, 20.00, 1, NULL),
-(27, 6, 26, 20.00, 1, NULL),
-(28, 6, 27, 20.00, 1, NULL),
-(29, 6, 28, 20.00, 1, NULL),
-(30, 6, 29, 20.00, 1, NULL),
-(31, 6, 30, 20.00, 1, NULL),
-(32, 6, 31, 20.00, 1, NULL),
-(33, 6, 11, 50.00, 1, NULL),
-(34, 6, 32, 50.00, 1, NULL),
-(35, 6, 33, 50.00, 1, NULL),
-(36, 7, 1, 20.00, 1, NULL),
-(37, 7, 2, 20.00, 1, NULL),
-(38, 7, 3, 20.00, 1, NULL),
-(39, 7, 4, 20.00, 1, NULL),
-(40, 7, 9, 20.00, 1, NULL),
-(41, 7, 10, 20.00, 1, NULL),
-(42, 7, 12, 20.00, 1, NULL),
-(43, 7, 13, 20.00, 1, NULL),
-(44, 7, 14, 20.00, 1, NULL),
-(45, 7, 15, 20.00, 1, NULL),
-(46, 7, 16, 20.00, 1, NULL),
-(47, 7, 17, 20.00, 1, NULL),
-(48, 7, 18, 20.00, 1, NULL),
-(49, 7, 19, 20.00, 1, NULL),
-(50, 7, 20, 20.00, 1, NULL),
-(51, 7, 21, 20.00, 1, NULL),
-(52, 7, 5, 20.00, 1, NULL),
-(53, 7, 6, 20.00, 1, NULL),
-(54, 7, 7, 20.00, 1, NULL),
-(55, 7, 8, 20.00, 1, NULL),
-(56, 7, 22, 20.00, 1, NULL),
-(57, 7, 23, 20.00, 1, NULL),
-(58, 7, 24, 20.00, 1, NULL),
-(59, 7, 25, 20.00, 1, NULL),
-(60, 7, 26, 20.00, 1, NULL),
-(61, 7, 27, 20.00, 1, NULL),
-(62, 7, 28, 20.00, 1, NULL),
-(63, 7, 29, 20.00, 1, NULL),
-(64, 7, 30, 20.00, 1, NULL),
-(65, 7, 31, 20.00, 1, NULL),
-(66, 7, 11, 50.00, 1, NULL),
-(67, 7, 32, 50.00, 1, NULL),
-(68, 7, 33, 50.00, 1, NULL),
-(69, 5, 1, 20.00, 1, NULL),
-(70, 5, 2, 20.00, 1, NULL),
-(71, 5, 3, 20.00, 1, NULL),
-(72, 5, 4, 20.00, 1, NULL),
-(73, 5, 9, 20.00, 1, NULL),
-(74, 5, 10, 20.00, 1, NULL),
-(75, 5, 12, 20.00, 1, NULL),
-(76, 5, 13, 20.00, 1, NULL),
-(77, 5, 14, 20.00, 1, NULL),
-(78, 5, 15, 20.00, 1, NULL),
-(79, 5, 16, 20.00, 1, NULL),
-(80, 5, 17, 20.00, 1, NULL),
-(81, 5, 18, 20.00, 1, NULL),
-(82, 5, 19, 20.00, 1, NULL),
-(83, 5, 20, 20.00, 1, NULL),
-(84, 5, 21, 20.00, 1, NULL),
-(85, 5, 5, 20.00, 1, NULL),
-(86, 5, 6, 20.00, 1, NULL),
-(87, 5, 7, 20.00, 1, NULL),
-(88, 5, 8, 20.00, 1, NULL),
-(89, 5, 22, 20.00, 1, NULL),
-(90, 5, 23, 20.00, 1, NULL),
-(91, 5, 24, 20.00, 1, NULL),
-(92, 5, 25, 20.00, 1, NULL),
-(93, 5, 26, 20.00, 1, NULL),
-(94, 5, 27, 20.00, 1, NULL),
-(95, 5, 28, 20.00, 1, NULL),
-(96, 5, 29, 20.00, 1, NULL),
-(97, 5, 30, 20.00, 1, NULL),
-(98, 5, 31, 20.00, 1, NULL),
-(99, 5, 11, 50.00, 1, NULL),
-(100, 5, 32, 50.00, 1, NULL),
-(101, 5, 33, 50.00, 1, NULL),
-(102, 3, 1, 20.00, 1, NULL),
-(103, 3, 2, 20.00, 1, NULL),
-(104, 3, 3, 20.00, 1, NULL),
-(105, 3, 4, 20.00, 1, NULL),
-(106, 3, 9, 20.00, 1, NULL),
-(107, 3, 10, 20.00, 1, NULL),
-(108, 3, 12, 20.00, 1, NULL),
-(109, 3, 13, 20.00, 1, NULL),
-(110, 3, 14, 20.00, 1, NULL),
-(111, 3, 15, 20.00, 1, NULL),
-(112, 3, 16, 20.00, 1, NULL),
-(113, 3, 17, 20.00, 1, NULL),
-(114, 3, 18, 20.00, 1, NULL),
-(115, 3, 19, 20.00, 1, NULL),
-(116, 3, 20, 20.00, 1, NULL),
-(117, 3, 21, 20.00, 1, NULL),
-(118, 3, 5, 20.00, 1, NULL),
-(119, 3, 6, 20.00, 1, NULL),
-(120, 3, 7, 20.00, 1, NULL),
-(121, 3, 8, 20.00, 1, NULL),
-(122, 3, 22, 20.00, 1, NULL),
-(123, 3, 23, 20.00, 1, NULL),
-(124, 3, 24, 20.00, 1, NULL),
-(125, 3, 25, 20.00, 1, NULL),
-(126, 3, 26, 20.00, 1, NULL),
-(127, 3, 27, 20.00, 1, NULL),
-(128, 3, 28, 20.00, 1, NULL),
-(129, 3, 29, 20.00, 1, NULL),
-(130, 3, 30, 20.00, 1, NULL),
-(131, 3, 31, 20.00, 1, NULL),
-(132, 3, 11, 50.00, 1, NULL),
-(133, 3, 32, 50.00, 1, NULL),
-(134, 3, 33, 50.00, 1, NULL),
-(135, 4, 1, 20.00, 1, NULL),
-(136, 4, 2, 20.00, 1, NULL),
-(137, 4, 3, 20.00, 1, NULL),
-(138, 4, 4, 20.00, 1, NULL),
-(139, 4, 9, 20.00, 1, NULL),
-(140, 4, 10, 20.00, 1, NULL),
-(141, 4, 12, 20.00, 1, NULL),
-(142, 4, 13, 20.00, 1, NULL),
-(143, 4, 14, 20.00, 1, NULL),
-(144, 4, 15, 20.00, 1, NULL),
-(145, 4, 16, 20.00, 1, NULL),
-(146, 4, 17, 20.00, 1, NULL),
-(147, 4, 18, 20.00, 1, NULL),
-(148, 4, 19, 20.00, 1, NULL),
-(149, 4, 20, 20.00, 1, NULL),
-(150, 4, 21, 20.00, 1, NULL),
-(151, 4, 5, 20.00, 1, NULL),
-(152, 4, 6, 20.00, 1, NULL),
-(153, 4, 7, 20.00, 1, NULL),
-(154, 4, 8, 20.00, 1, NULL),
-(155, 4, 22, 20.00, 1, NULL),
-(156, 4, 23, 20.00, 1, NULL),
-(157, 4, 24, 20.00, 1, NULL),
-(158, 4, 25, 20.00, 1, NULL),
-(159, 4, 26, 20.00, 1, NULL),
-(160, 4, 27, 20.00, 1, NULL),
-(161, 4, 28, 20.00, 1, NULL),
-(162, 4, 29, 20.00, 1, NULL),
-(163, 4, 30, 20.00, 1, NULL),
-(164, 4, 31, 20.00, 1, NULL),
-(165, 4, 11, 50.00, 1, NULL),
-(166, 4, 32, 50.00, 1, NULL),
-(167, 4, 33, 50.00, 1, NULL);
+(168, 7, 78, 10.00, 1, NULL),
+(169, 7, 79, 10.00, 1, NULL),
+(170, 7, 80, 10.00, 1, NULL),
+(171, 7, 81, 10.00, 1, NULL),
+(172, 7, 82, 10.00, 1, NULL),
+(173, 7, 83, 90.00, 1, NULL),
+(174, 7, 84, 90.00, 1, NULL),
+(175, 7, 85, 90.00, 1, NULL),
+(176, 7, 86, 40.00, 1, NULL),
+(177, 7, 87, 40.00, 1, NULL),
+(178, 7, 88, 40.00, 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -441,7 +260,9 @@ CREATE TABLE `teacher_subject_section` (
 --
 
 INSERT INTO `teacher_subject_section` (`id`, `teacher_id`, `section`, `subject`) VALUES
-(2, 8, '10-D', 'Math');
+(2, 8, '10-D', 'Math'),
+(5, 8, '7-A', 'Math'),
+(4, 8, '8-B', 'Math');
 
 -- --------------------------------------------------------
 
@@ -547,13 +368,13 @@ ALTER TABLE `advisory_section`
 -- AUTO_INCREMENT for table `assignments`
 --
 ALTER TABLE `assignments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=78;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=111;
 
 --
 -- AUTO_INCREMENT for table `audit_log`
 --
 ALTER TABLE `audit_log`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `grading_weights`
@@ -565,7 +386,7 @@ ALTER TABLE `grading_weights`
 -- AUTO_INCREMENT for table `scores`
 --
 ALTER TABLE `scores`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=168;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=179;
 
 --
 -- AUTO_INCREMENT for table `students`
@@ -583,7 +404,7 @@ ALTER TABLE `subjects`
 -- AUTO_INCREMENT for table `teacher_subject_section`
 --
 ALTER TABLE `teacher_subject_section`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `users`
