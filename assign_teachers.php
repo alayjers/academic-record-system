@@ -213,7 +213,12 @@ $advisory_assignments = $stmt->fetchAll();
             </div>
             <div class="form-group" id="subject_field_wrapper">
                 <label>Subject</label>
-                <input type="text" name="subject" id="subject_field" placeholder="e.g., Mathematics">
+                <select name="subject_id" id="subject_field">
+                    <option value="">Select Subject</option>
+                    <?php foreach ($all_subjects as $sub): ?>
+                        <option value="<?php echo $sub['id']; ?>"><?php echo htmlspecialchars($sub['subject_name']); ?></option>
+                    <?php endforeach; ?>
+                </select>
             </div>
             <div class="modal-footer">
                 <button type="button" onclick="closeModal('assignModal')" class="btn-secondary">Cancel</button>
