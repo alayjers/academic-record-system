@@ -2,14 +2,20 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost
--- Generation Time: Jun 03, 2026 at 09:06 AM
--- Server version: 10.4.28-MariaDB
--- PHP Version: 8.2.4
+-- Host: 127.0.0.1
+-- Generation Time: Jun 03, 2026 at 12:37 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
 
 --
 -- Database: `academic_system`
@@ -58,39 +64,39 @@ CREATE TABLE `assignments` (
 --
 
 INSERT INTO `assignments` (`id`, `name`, `type`, `category`, `max_score`, `weight`, `semester`, `subject_id`) VALUES
-(78, 'WW1', 'quiz', 'written', 10, 4.00, 1, 1),
-(79, 'WW2', 'quiz', 'written', 15, 4.00, 1, 1),
-(80, 'WW3', 'quiz', 'written', 15, 4.00, 1, 1),
-(81, 'WW4', 'quiz', 'written', 10, 4.00, 1, 1),
-(82, 'WW5', 'quiz', 'written', 15, 4.00, 1, 1),
-(83, 'PT1', 'quiz', 'performance', 100, 16.67, 1, 1),
-(84, 'PT2', 'quiz', 'performance', 100, 16.67, 1, 1),
-(85, 'PT3', 'quiz', 'performance', 100, 16.66, 1, 1),
-(86, 'ST1', 'quiz', 'exam', 50, 10.00, 1, 1),
-(87, 'ST2', 'quiz', 'exam', 50, 10.00, 1, 1),
-(88, 'TE', 'quiz', 'exam', 50, 10.00, 1, 1),
-(89, 'WW1', 'quiz', 'written', 10, 4.00, 2, 1),
-(90, 'WW2', 'quiz', 'written', 15, 4.00, 2, 1),
-(91, 'WW3', 'quiz', 'written', 15, 4.00, 2, 1),
-(92, 'WW4', 'quiz', 'written', 10, 4.00, 2, 1),
-(93, 'WW5', 'quiz', 'written', 15, 4.00, 2, 1),
-(94, 'PT1', 'quiz', 'performance', 100, 16.67, 2, 1),
-(95, 'PT2', 'quiz', 'performance', 100, 16.67, 2, 1),
-(96, 'PT3', 'quiz', 'performance', 100, 16.66, 2, 1),
-(97, 'ST1', 'quiz', 'exam', 50, 10.00, 2, 1),
-(98, 'ST2', 'quiz', 'exam', 50, 10.00, 2, 1),
-(99, 'TE', 'quiz', 'exam', 50, 10.00, 2, 1),
-(100, 'WW1', 'quiz', 'written', 10, 4.00, 3, 1),
-(101, 'WW2', 'quiz', 'written', 15, 4.00, 3, 1),
-(102, 'WW3', 'quiz', 'written', 15, 4.00, 3, 1),
-(103, 'WW4', 'quiz', 'written', 10, 4.00, 3, 1),
-(104, 'WW5', 'quiz', 'written', 15, 4.00, 3, 1),
-(105, 'PT1', 'quiz', 'performance', 100, 16.67, 3, 1),
-(106, 'PT2', 'quiz', 'performance', 100, 16.67, 3, 1),
-(107, 'PT3', 'quiz', 'performance', 100, 16.66, 3, 1),
-(108, 'ST1', 'quiz', 'exam', 50, 10.00, 3, 1),
-(109, 'ST2', 'quiz', 'exam', 50, 10.00, 3, 1),
-(110, 'TE', 'quiz', 'exam', 50, 10.00, 3, 1);
+(78, 'WW1', 'quiz', 'written', 30, 4.00, 1, 3),
+(79, 'WW2', 'quiz', 'written', 15, 4.00, 1, 3),
+(80, 'WW3', 'quiz', 'written', 15, 4.00, 1, 3),
+(81, 'WW4', 'quiz', 'written', 10, 4.00, 1, 3),
+(82, 'WW5', 'quiz', 'written', 15, 4.00, 1, 3),
+(83, 'PT1', 'quiz', 'performance', 100, 16.67, 1, 3),
+(84, 'PT2', 'quiz', 'performance', 100, 16.67, 1, 3),
+(85, 'PT3', 'quiz', 'performance', 100, 16.66, 1, 3),
+(86, 'ST1', 'quiz', 'exam', 50, 10.00, 1, 3),
+(87, 'ST2', 'quiz', 'exam', 50, 10.00, 1, 3),
+(88, 'TE', 'quiz', 'exam', 50, 10.00, 1, 3),
+(89, 'WW1', 'quiz', 'written', 10, 4.00, 2, 3),
+(90, 'WW2', 'quiz', 'written', 15, 4.00, 2, 3),
+(91, 'WW3', 'quiz', 'written', 15, 4.00, 2, 3),
+(92, 'WW4', 'quiz', 'written', 10, 4.00, 2, 3),
+(93, 'WW5', 'quiz', 'written', 15, 4.00, 2, 3),
+(94, 'PT1', 'quiz', 'performance', 100, 16.67, 2, 3),
+(95, 'PT2', 'quiz', 'performance', 100, 16.67, 2, 3),
+(96, 'PT3', 'quiz', 'performance', 100, 16.66, 2, 3),
+(97, 'ST1', 'quiz', 'exam', 50, 10.00, 2, 3),
+(98, 'ST2', 'quiz', 'exam', 50, 10.00, 2, 3),
+(99, 'TE', 'quiz', 'exam', 50, 10.00, 2, 3),
+(100, 'WW1', 'quiz', 'written', 10, 4.00, 3, 3),
+(101, 'WW2', 'quiz', 'written', 15, 4.00, 3, 3),
+(102, 'WW3', 'quiz', 'written', 15, 4.00, 3, 3),
+(103, 'WW4', 'quiz', 'written', 10, 4.00, 3, 3),
+(104, 'WW5', 'quiz', 'written', 15, 4.00, 3, 3),
+(105, 'PT1', 'quiz', 'performance', 100, 16.67, 3, 3),
+(106, 'PT2', 'quiz', 'performance', 100, 16.67, 3, 3),
+(107, 'PT3', 'quiz', 'performance', 100, 16.66, 3, 3),
+(108, 'ST1', 'quiz', 'exam', 50, 10.00, 3, 3),
+(109, 'ST2', 'quiz', 'exam', 50, 10.00, 3, 3),
+(110, 'TE', 'quiz', 'exam', 50, 10.00, 3, 3);
 
 -- --------------------------------------------------------
 
@@ -106,28 +112,51 @@ CREATE TABLE `audit_log` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
-
 --
--- Table structure for table `grading_weights`
+-- Dumping data for table `audit_log`
 --
 
-CREATE TABLE `grading_weights` (
-  `id` int(11) NOT NULL,
-  `name` varchar(100) NOT NULL,
-  `category_weight_written` decimal(5,2) DEFAULT 40.00,
-  `category_weight_pt` decimal(5,2) DEFAULT 40.00,
-  `category_weight_exam` decimal(5,2) DEFAULT 20.00
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `grading_weights`
---
-
-INSERT INTO `grading_weights` (`id`, `name`, `category_weight_written`, `category_weight_pt`, `category_weight_exam`) VALUES
-(1, 'General', 40.00, 40.00, 20.00),
-(2, 'General', 40.00, 40.00, 20.00),
-(3, 'General', 40.00, 40.00, 20.00);
+INSERT INTO `audit_log` (`id`, `user_id`, `action`, `details`, `created_at`) VALUES
+(1, 3, 'UPDATE_SCORE', 'Student 16, Assignment 78, Semester 1: score changed from NULL to 1', '2026-06-03 09:30:48'),
+(2, 3, 'UPDATE_SCORE', 'Student 16, Assignment 78, Semester 1: score changed from 1.00 to 10', '2026-06-03 09:30:59'),
+(3, 3, 'UPDATE_SCORE', 'Student 16, Assignment 79, Semester 1: score changed from NULL to 14', '2026-06-03 09:30:59'),
+(4, 3, 'UPDATE_SCORE', 'Student 16, Assignment 80, Semester 1: score changed from NULL to 14', '2026-06-03 09:30:59'),
+(5, 3, 'UPDATE_SCORE', 'Student 16, Assignment 81, Semester 1: score changed from NULL to 10', '2026-06-03 09:30:59'),
+(6, 3, 'UPDATE_SCORE', 'Student 16, Assignment 82, Semester 1: score changed from NULL to 14', '2026-06-03 09:30:59'),
+(7, 3, 'UPDATE_SCORE', 'Student 16, Assignment 83, Semester 1: score changed from NULL to 90', '2026-06-03 09:30:59'),
+(8, 3, 'UPDATE_SCORE', 'Student 16, Assignment 84, Semester 1: score changed from NULL to 90', '2026-06-03 09:30:59'),
+(9, 3, 'UPDATE_SCORE', 'Student 16, Assignment 85, Semester 1: score changed from NULL to 90', '2026-06-03 09:30:59'),
+(10, 3, 'UPDATE_SCORE', 'Student 16, Assignment 86, Semester 1: score changed from NULL to 40', '2026-06-03 09:30:59'),
+(11, 3, 'UPDATE_SCORE', 'Student 16, Assignment 87, Semester 1: score changed from NULL to 40', '2026-06-03 09:30:59'),
+(12, 3, 'UPDATE_SCORE', 'Student 16, Assignment 88, Semester 1: score changed from NULL to 40', '2026-06-03 09:30:59'),
+(13, 3, 'UPDATE_SCORE', 'Student 17, Assignment 78, Semester 1: score changed from NULL to -10', '2026-06-03 09:46:55'),
+(14, 3, 'UPDATE_MAX_SCORE', 'Assignment ID 78: max_score changed from 10 to 13', '2026-06-03 10:03:47'),
+(15, 3, 'UPDATE_SCORE', 'Student 17, Assignment 78, Semester 1: score changed from -10.00 to 12', '2026-06-03 10:03:49'),
+(16, 3, 'UPDATE_SCORE', 'Student 18, Assignment 78, Semester 1: score changed from NULL to 0', '2026-06-03 10:09:08'),
+(17, 3, 'UPDATE_SCORE', 'Student 18, Assignment 79, Semester 1: score changed from NULL to 0', '2026-06-03 10:09:08'),
+(18, 3, 'UPDATE_SCORE', 'Student 18, Assignment 80, Semester 1: score changed from NULL to 0', '2026-06-03 10:09:08'),
+(19, 3, 'UPDATE_SCORE', 'Student 18, Assignment 81, Semester 1: score changed from NULL to 0', '2026-06-03 10:09:08'),
+(20, 3, 'UPDATE_SCORE', 'Student 18, Assignment 82, Semester 1: score changed from NULL to 0', '2026-06-03 10:09:08'),
+(21, 3, 'UPDATE_SCORE', 'Student 18, Assignment 83, Semester 1: score changed from NULL to 0', '2026-06-03 10:09:08'),
+(22, 3, 'UPDATE_SCORE', 'Student 18, Assignment 84, Semester 1: score changed from NULL to 0', '2026-06-03 10:09:08'),
+(23, 3, 'UPDATE_SCORE', 'Student 18, Assignment 85, Semester 1: score changed from NULL to 0', '2026-06-03 10:09:08'),
+(24, 3, 'UPDATE_SCORE', 'Student 18, Assignment 86, Semester 1: score changed from NULL to 0', '2026-06-03 10:09:08'),
+(25, 3, 'UPDATE_SCORE', 'Student 18, Assignment 87, Semester 1: score changed from NULL to 0', '2026-06-03 10:09:08'),
+(26, 3, 'UPDATE_SCORE', 'Student 18, Assignment 88, Semester 1: score changed from NULL to 0', '2026-06-03 10:09:08'),
+(27, 3, 'UPDATE_SCORE', 'Student 18, Assignment 78, Semester 1: score changed from 0.00 to 12', '2026-06-03 10:09:27'),
+(28, 3, 'UPDATE_SCORE', 'Student 18, Assignment 79, Semester 1: score changed from 0.00 to 15', '2026-06-03 10:09:27'),
+(29, 3, 'UPDATE_SCORE', 'Student 18, Assignment 80, Semester 1: score changed from 0.00 to 15', '2026-06-03 10:09:27'),
+(30, 3, 'UPDATE_SCORE', 'Student 18, Assignment 81, Semester 1: score changed from 0.00 to 10', '2026-06-03 10:09:27'),
+(31, 3, 'UPDATE_SCORE', 'Student 18, Assignment 82, Semester 1: score changed from 0.00 to 15', '2026-06-03 10:09:27'),
+(32, 3, 'UPDATE_SCORE', 'Student 18, Assignment 83, Semester 1: score changed from 0.00 to 90', '2026-06-03 10:09:27'),
+(33, 3, 'UPDATE_SCORE', 'Student 18, Assignment 84, Semester 1: score changed from 0.00 to 90', '2026-06-03 10:09:27'),
+(34, 3, 'UPDATE_SCORE', 'Student 18, Assignment 85, Semester 1: score changed from 0.00 to 90', '2026-06-03 10:09:27'),
+(35, 3, 'UPDATE_SCORE', 'Student 18, Assignment 86, Semester 1: score changed from 0.00 to 30', '2026-06-03 10:09:35'),
+(36, 3, 'UPDATE_SCORE', 'Student 18, Assignment 87, Semester 1: score changed from 0.00 to 30', '2026-06-03 10:09:35'),
+(37, 3, 'UPDATE_SCORE', 'Student 19, Assignment 78, Semester 1: score changed from NULL to 12.5', '2026-06-03 10:24:41'),
+(38, 3, 'UPDATE_MAX_SCORE', 'Assignment ID 78: max_score changed from 13 to 16', '2026-06-03 10:25:09'),
+(39, 3, 'UPDATE_MAX_SCORE', 'Assignment ID 78: max_score changed from 16 to 25', '2026-06-03 10:25:13'),
+(40, 3, 'UPDATE_MAX_SCORE', 'Assignment ID 78: max_score changed from 25 to 30', '2026-06-03 10:26:12');
 
 -- --------------------------------------------------------
 
@@ -144,6 +173,36 @@ CREATE TABLE `scores` (
   `school_year` varchar(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `scores`
+--
+
+INSERT INTO `scores` (`id`, `student_id`, `assignment_id`, `score`, `semester`, `school_year`) VALUES
+(12, 16, 78, 10.00, 1, NULL),
+(13, 16, 79, 14.00, 1, NULL),
+(14, 16, 80, 14.00, 1, NULL),
+(15, 16, 81, 10.00, 1, NULL),
+(16, 16, 82, 14.00, 1, NULL),
+(17, 16, 83, 90.00, 1, NULL),
+(18, 16, 84, 90.00, 1, NULL),
+(19, 16, 85, 90.00, 1, NULL),
+(20, 16, 86, 40.00, 1, NULL),
+(21, 16, 87, 40.00, 1, NULL),
+(22, 16, 88, 40.00, 1, NULL),
+(23, 17, 78, 12.00, 1, NULL),
+(24, 18, 78, 12.00, 1, NULL),
+(25, 18, 79, 15.00, 1, NULL),
+(26, 18, 80, 15.00, 1, NULL),
+(27, 18, 81, 10.00, 1, NULL),
+(28, 18, 82, 15.00, 1, NULL),
+(29, 18, 83, 90.00, 1, NULL),
+(30, 18, 84, 90.00, 1, NULL),
+(31, 18, 85, 90.00, 1, NULL),
+(32, 18, 86, 30.00, 1, NULL),
+(33, 18, 87, 30.00, 1, NULL),
+(34, 18, 88, 0.00, 1, NULL),
+(35, 19, 78, 12.50, 1, NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -152,7 +211,7 @@ CREATE TABLE `scores` (
 
 CREATE TABLE `students` (
   `id` int(11) NOT NULL,
-  `student_id` varchar(20) NOT NULL,
+  `school_id_number` varchar(20) NOT NULL,
   `name` varchar(100) NOT NULL,
   `first_name` varchar(100) DEFAULT NULL,
   `last_name` varchar(100) DEFAULT NULL,
@@ -168,7 +227,7 @@ CREATE TABLE `students` (
 -- Dumping data for table `students`
 --
 
-INSERT INTO `students` (`id`, `student_id`, `name`, `first_name`, `last_name`, `lrn`, `birth_date`, `gender`, `grade_level`, `section`, `created_at`) VALUES
+INSERT INTO `students` (`id`, `school_id_number`, `name`, `first_name`, `last_name`, `lrn`, `birth_date`, `gender`, `grade_level`, `section`, `created_at`) VALUES
 (16, '20261-00001', 'Habibi, Junior', 'Junior', 'Habibi', '293493929494', '2009-06-26', 'Male', 7, '1-A', '2026-06-02 07:41:19'),
 (17, '20261-00002', 'Habibi, Senior', 'Senior', 'Habibi', '128323737333', '2010-04-10', 'Female', 7, '1-A', '2026-06-02 07:41:58'),
 (18, '20261-00003', 'Doe, John', 'John', 'Doe', '721471273717', '2008-11-29', 'Male', 7, '1-B', '2026-06-03 06:43:23'),
@@ -213,19 +272,8 @@ CREATE TABLE `teacher_subject_section` (
   `id` int(11) NOT NULL,
   `teacher_id` int(11) NOT NULL,
   `section` varchar(50) NOT NULL,
-  `subject` varchar(100) NOT NULL
+  `subject_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `teacher_subject_section`
---
-
-INSERT INTO `teacher_subject_section` (`id`, `teacher_id`, `section`, `subject`) VALUES
-(4, 12, '1-A', 'Science'),
-(5, 13, '1-A', 'AP'),
-(7, 14, '1-A', 'Mapeh'),
-(6, 15, '1-A', 'Filipino'),
-(8, 16, '1-A', 'English');
 
 -- --------------------------------------------------------
 
@@ -247,14 +295,14 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `username`, `password`, `full_name`, `role`, `created_at`) VALUES
-(3, 'admin', '$2y$10$6axogDDGjYEK7Yyf12YSU.G.NrZC6HwIexABNnWxanOBZBxHTwAxq', 'System Administrator', 'admin', '2026-05-17 17:44:12'),
-(8, 'math_teacher', '$2y$10$CRa1B5/JeED3n53JNsnxiuAXE2O2o5FVMsfyJbmJ53oucpKY.Ao9O', 'Mr. Math Teacher', 'subject_teacher', '2026-05-29 19:03:51'),
-(9, 'advisory_teacher', '$2y$10$CRa1B5/JeED3n53JNsnxiuAXE2O2o5FVMsfyJbmJ53oucpKY.Ao9O', 'Ms. Advisory Teacher', 'advisory_teacher', '2026-05-29 19:03:51'),
-(12, 'science_teacher', '$2y$10$HHpCOtQq5vfMEyDkPl/aFeUvMVT.oMwbZdbFQg3CxI75rd8Raavwm', 'Mr. Science Teacher', 'subject_teacher', '2026-06-03 06:04:23'),
-(13, 'ap_teacher', '$2y$10$hAsEBuy6tCU5ubxCQAXfbO4PZEI.P0TcC4PbalxOxrmGrNwGwAUym', 'Ms. AP Teacher', 'subject_teacher', '2026-06-03 06:27:05'),
-(14, 'mapeh_teacher', '$2y$10$s4BmDaruspiKwFO6voEXBec6B9DFHPE4kXLfK9uLo8tP7yN1gF.Ye', 'Mrs. Mapeh Teacher', 'subject_teacher', '2026-06-03 06:39:22'),
-(15, 'filipino_teacher', '$2y$10$pwXkbdt24styF2SPrpJPPuye1wjkvPNYSywJXy41/aMmiXTSnOOnC', 'Mr. Filipino Teacher', 'subject_teacher', '2026-06-03 06:41:59'),
-(16, 'english_teacher', '$2y$10$vk.zgINDBZPgET6.Kk56iuDFiXWT.x983EhEJ2.1uvGhu3Fm7Wc52', 'Ms. English Teacher', 'subject_teacher', '2026-06-03 06:42:21');
+(3, 'admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'System Administrator', 'admin', '2026-05-17 17:44:12'),
+(8, 'math_teacher', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Mr. Math Teacher', 'subject_teacher', '2026-05-29 19:03:51'),
+(9, 'advisory_teacher', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Ms. Advisory Teacher', 'advisory_teacher', '2026-05-29 19:03:51'),
+(12, 'science_teacher', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Mr. Science Teacher', 'subject_teacher', '2026-06-03 06:04:23'),
+(13, 'ap_teacher', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Ms. AP Teacher', 'subject_teacher', '2026-06-03 06:27:05'),
+(14, 'mapeh_teacher', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Mrs. Mapeh Teacher', 'subject_teacher', '2026-06-03 06:39:22'),
+(15, 'filipino_teacher', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Mr. Filipino Teacher', 'subject_teacher', '2026-06-03 06:41:59'),
+(16, 'english_teacher', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Ms. English Teacher', 'subject_teacher', '2026-06-03 06:42:21');
 
 --
 -- Indexes for dumped tables
@@ -282,16 +330,11 @@ ALTER TABLE `audit_log`
   ADD KEY `user_id` (`user_id`);
 
 --
--- Indexes for table `grading_weights`
---
-ALTER TABLE `grading_weights`
-  ADD PRIMARY KEY (`id`);
-
---
 -- Indexes for table `scores`
 --
 ALTER TABLE `scores`
   ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_student_assignment` (`student_id`,`assignment_id`,`semester`),
   ADD KEY `student_id` (`student_id`),
   ADD KEY `assignment_id` (`assignment_id`);
 
@@ -300,7 +343,7 @@ ALTER TABLE `scores`
 --
 ALTER TABLE `students`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `student_id` (`student_id`);
+  ADD UNIQUE KEY `student_id` (`school_id_number`);
 
 --
 -- Indexes for table `subjects`
@@ -313,7 +356,8 @@ ALTER TABLE `subjects`
 --
 ALTER TABLE `teacher_subject_section`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `unique_assignment` (`teacher_id`,`section`,`subject`);
+  ADD UNIQUE KEY `unique_assignment` (`teacher_id`,`section`,`subject_id`),
+  ADD KEY `tss_subject_fk` (`subject_id`);
 
 --
 -- Indexes for table `users`
@@ -342,19 +386,13 @@ ALTER TABLE `assignments`
 -- AUTO_INCREMENT for table `audit_log`
 --
 ALTER TABLE `audit_log`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `grading_weights`
---
-ALTER TABLE `grading_weights`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT for table `scores`
 --
 ALTER TABLE `scores`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=168;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT for table `students`
@@ -372,7 +410,7 @@ ALTER TABLE `subjects`
 -- AUTO_INCREMENT for table `teacher_subject_section`
 --
 ALTER TABLE `teacher_subject_section`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -394,7 +432,7 @@ ALTER TABLE `advisory_section`
 -- Constraints for table `assignments`
 --
 ALTER TABLE `assignments`
-  ADD CONSTRAINT `assignments_ibfk_1` FOREIGN KEY (`subject_id`) REFERENCES `grading_weights` (`id`) ON DELETE SET NULL;
+  ADD CONSTRAINT `fk_assignments_subject` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `audit_log`
@@ -413,5 +451,10 @@ ALTER TABLE `scores`
 -- Constraints for table `teacher_subject_section`
 --
 ALTER TABLE `teacher_subject_section`
-  ADD CONSTRAINT `teacher_subject_section_ibfk_1` FOREIGN KEY (`teacher_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `teacher_subject_section_ibfk_1` FOREIGN KEY (`teacher_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `tss_subject_fk` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) ON DELETE CASCADE;
 COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

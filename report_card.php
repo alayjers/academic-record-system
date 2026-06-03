@@ -49,13 +49,13 @@ $search_results = [];
 if (!empty($search)) {
     $like = "%$search%";
     $stmt = $pdo->prepare("
-        SELECT id, name, first_name, last_name, lrn, student_id, grade_level, section 
+        SELECT id, name, first_name, last_name, lrn, school_id_number, grade_level, section 
         FROM students 
         WHERE name LIKE ? 
            OR first_name LIKE ? 
            OR last_name LIKE ? 
            OR lrn LIKE ? 
-           OR student_id LIKE ?
+           OR school_id_number LIKE ?
         ORDER BY last_name ASC, first_name ASC
         LIMIT 20
     ");
@@ -138,56 +138,128 @@ if ($student_id > 0) {
 ?>
 
 <style>
-    .search-container { background: rgba(255, 255, 255, 0.02); padding: 22px; border-radius: 12px; margin-bottom: 24px; border: 1px solid var(--border-card); }
+    /* ==========================================================
+       DYNAMIC THEMING CONFIGURATION (ADAPTS TO GLOBAL LAYOUT)
+       ========================================================== */
+    /* Forced body selectors removed so header.php controls framework background toggles */
+
+    .search-container { 
+        background: rgba(128, 128, 128, 0.06); 
+        padding: 22px; 
+        border-radius: 12px; 
+        margin-bottom: 24px; 
+        border: 1px solid rgba(128, 128, 128, 0.15); 
+    }
     .search-box { display: flex; gap: 12px; align-items: center; }
     .search-box input { 
         flex: 1; 
         padding: 12px 16px; 
         font-size: 14px; 
-        border: 1px solid var(--border-card); 
+        border: 1px solid rgba(128, 128, 128, 0.25); 
         border-radius: 8px; 
-        background: var(--input-bg, #ffffff); 
-        color: var(--input-text, #1e293b); 
+        background: var(--input-bg, inherit); 
+        color: var(--input-text, inherit); 
         outline: none; 
     }
-    .search-box input::placeholder { color: var(--input-placeholder, #94a3b8); opacity: 1; }
-    .search-box input:focus { border-color: var(--text-subtitle); }
-    .search-box button { padding: 12px 24px; background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+    .search-box input:focus { border-color: #00b4d8; }
+    .search-box button { 
+        padding: 12px 24px; 
+        background: linear-gradient(135deg, var(--primary-start, #0077b6) 0%, var(--primary-end, #00b4d8) 100%); 
+        color: white; 
+        border: none; 
+        border-radius: 8px; 
+        cursor: pointer; 
+        font-weight: 600; 
+    }
     
-    .search-results { background: rgba(255, 255, 255, 0.02); padding: 20px; border-radius: 12px; margin-bottom: 24px; border: 1px solid var(--border-card); }
-    .search-results h3 { font-size: 15px; color: var(--text-subtitle); margin-bottom: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-    .result-item { padding: 12px 16px; border: 1px solid var(--border-card); border-radius: 8px; margin-bottom: 8px; background: rgba(255, 255, 255, 0.01); transition: all 0.2s ease; }
-    .result-item a { text-decoration: none; color: var(--text-title); display: block; font-weight: 500; font-size: 14px; }
-    .result-item:hover { background: rgba(0, 180, 216, 0.08); border-color: var(--text-subtitle); }
+    .search-results { 
+        background: rgba(128, 128, 128, 0.04); 
+        padding: 20px; 
+        border-radius: 12px; 
+        margin-bottom: 24px; 
+        border: 1px solid rgba(128, 128, 128, 0.15); 
+    }
+    .search-results h3 { font-size: 15px; color: #00b4d8; margin-bottom: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .result-item { 
+        padding: 12px 16px; 
+        border: 1px solid rgba(128, 128, 128, 0.15); 
+        border-radius: 8px; 
+        margin-bottom: 8px; 
+        background: rgba(128, 128, 128, 0.02); 
+        transition: all 0.2s ease; 
+    }
+    .result-item a { text-decoration: none; color: inherit; display: block; font-weight: 500; font-size: 14px; }
+    .result-item:hover { background: rgba(0, 180, 216, 0.08); border-color: #00b4d8; }
     
-    .view-switcher-bar { display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 1px solid var(--border-card); padding-bottom: 8px; }
-    .view-tab { background: transparent; border: 1px solid transparent; color: var(--text-muted); padding: 10px 20px; font-size: 14px; font-weight: 500; cursor: pointer; border-radius: 8px; text-decoration: none; transition: all 0.2s ease; }
-    .view-tab:hover, .view-tab.active { background: var(--mode-btn-bg, rgba(255,255,255,0.05)); border-color: var(--mode-btn-border, rgba(255,255,255,0.1)); color: #00b4d8; font-weight: 600; }
+    .view-switcher-bar { display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 1px solid rgba(128, 128, 128, 0.15); padding-bottom: 8px; }
+    .view-tab { background: transparent; border: 1px solid transparent; color: inherit; opacity: 0.7; padding: 10px 20px; font-size: 14px; font-weight: 500; cursor: pointer; border-radius: 8px; text-decoration: none; transition: all 0.2s ease; }
+    .view-tab:hover, .view-tab.active { background: rgba(128, 128, 128, 0.1); border-color: rgba(128, 128, 128, 0.2); color: #00b4d8; opacity: 1; font-weight: 600; }
     
     .report-card { background: transparent; padding: 0; border-radius: 0; }
-    .toolbar { margin-bottom: 20px; background: rgba(255, 255, 255, 0.02); padding: 16px 20px; display: flex; gap: 20px; align-items: center; flex-wrap: wrap; border-radius: 12px; border: 1px solid var(--border-card); }
-    .toolbar label { font-size: 13px; color: var(--text-muted); font-weight: 500; }
-    .toolbar input[type="text"] { padding: 8px 12px; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-card); border-radius: 6px; color: white; font-size: 13px; outline: none; }
-    .toolbar input[type="text"]:focus { border-color: var(--text-subtitle); }
-    .btn-print { background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%); color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 6px; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; }
-    .btn-secondary { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border-card); }
-    .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+    .toolbar { 
+        margin-bottom: 20px; 
+        background: rgba(128, 128, 128, 0.05); 
+        padding: 16px 20px; 
+        display: flex; 
+        gap: 20px; 
+        align-items: center; 
+        flex-wrap: wrap; 
+        border-radius: 12px; 
+        border: 1px solid rgba(128, 128, 128, 0.15); 
+    }
+    .toolbar label { font-size: 13px; font-weight: 500; }
+    .toolbar input[type="text"] { 
+        padding: 8px 12px; 
+        background: rgba(128, 128, 128, 0.08); 
+        border: 1px solid rgba(128, 128, 128, 0.2); 
+        border-radius: 6px; 
+        color: inherit; 
+        font-size: 13px; 
+        outline: none; 
+    }
+    .toolbar input[type="text"]:focus { border-color: #00b4d8; }
+    .btn-print { 
+        background: linear-gradient(135deg, var(--primary-start, #0077b6) 0%, var(--primary-end, #00b4d8) 100%); 
+        color: white; 
+        border: none; 
+        padding: 10px 20px; 
+        cursor: pointer; 
+        border-radius: 6px; 
+        font-weight: 600; 
+        font-size: 13px; 
+        display: inline-flex; 
+        align-items: center; 
+        gap: 8px; 
+    }
+    .btn-secondary { background: rgba(128, 128, 128, 0.12); border: 1px solid rgba(128, 128, 128, 0.2); color: inherit; }
+    .btn-secondary:hover { background: rgba(128, 128, 128, 0.22); }
     
-    .print-container { background: #ffffff; color: #000000; padding: 25px 30px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); max-width: 1140px; margin: 0 auto; }
+    /* ==========================================================
+       FORCE PRINT CONTAINER SHEET CONTENT TO STAY SOLID BLACK/WHITE
+       ========================================================== */
+    .print-container { 
+        background: #ffffff !important; 
+        color: #000000 !important; 
+        padding: 25px 30px; 
+        border-radius: 8px; 
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15); 
+        max-width: 1140px; 
+        margin: 0 auto; 
+    }
     .deped-header { text-align: center; margin-bottom: 15px; position: relative; border-bottom: 2px solid #000000; padding-bottom: 10px; }
     .deped-header img { height: 55px; position: absolute; left: 15px; top: 0; }
-    .deped-header h2 { font-size: 13px; font-weight: 800; margin: 0; letter-spacing: 0.5px; line-height: 1.3; color: #000000; }
-    .deped-header p { font-size: 11px; margin: 2px 0 0 0; line-height: 1.3; color: #333333; }
-    .deped-header .school-title { font-size: 14px; font-weight: 800; color: #000000; margin-top: 2px; }
+    .deped-header h2 { font-size: 13px; font-weight: 800; margin: 0; letter-spacing: 0.5px; line-height: 1.3; }
+    .deped-header p { font-size: 11px; margin: 2px 0 0 0; line-height: 1.3; }
+    .deped-header .school-title { font-size: 14px; font-weight: 800; margin-top: 2px; }
     
     .report-card-body { display: flex; gap: 30px; align-items: flex-start; margin-top: 15px; }
     .report-column { flex: 1; min-width: 0; }
     
-    .header-text { font-weight: 800; text-transform: uppercase; text-align: center; margin-bottom: 10px; font-size: 12px; color: #000000; letter-spacing: 0.5px; border-bottom: 1px solid #000000; padding-bottom: 4px; }
+    .header-text { font-weight: 800; text-transform: uppercase; text-align: center; margin-bottom: 10px; font-size: 12px; letter-spacing: 0.5px; border-bottom: 1px solid #000000; padding-bottom: 4px; }
     
     .print-container table { width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 11px; background: transparent; }
-    .print-container th, .print-container table td { border: 1px solid #000000; padding: 5px 4px; text-align: center; color: #000000; line-height: 1.2; }
-    .print-container th { background-color: #f5f5f5; font-weight: 700; text-transform: uppercase; font-size: 10px; }
+    .print-container th, .print-container table td { border: 1px solid #000000; padding: 5px 4px; text-align: center; line-height: 1.2; }
+    .print-container th { font-weight: 700; text-transform: uppercase; font-size: 10px; }
     .print-container .text-left { text-align: left; padding-left: 8px; }
     .print-container .text-center { text-align: center; }
     
@@ -198,16 +270,28 @@ if ($student_id > 0) {
 
     .legend-container { display: flex; justify-content: space-between; font-size: 10px; margin-top: 8px; border-top: 1px dashed #000000; padding-top: 8px; }
     .legend-table { width: auto; margin: 0; border: none; }
-    .legend-table th, .legend-table td { border: none !important; padding: 2px 6px; text-align: left; color: #000000 !important; background: transparent !important; }
+    .legend-table th, .legend-table td { border: none !important; padding: 2px 6px; text-align: left; background: transparent !important; }
     .legend-table th { font-weight: 700; padding-bottom: 4px; text-transform: uppercase; font-size: 9px; }
     
     .sf10-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px; }
     .sf10-block { border: 1px solid #000000; padding: 12px; border-radius: 4px; }
-    .sf10-header-info { display: flex; flex-wrap: wrap; gap: 15px; font-size: 11px; margin-bottom: 10px; background: #f9f9f9; padding: 6px; border: 1px solid #000; }
+    .sf10-header-info { display: flex; flex-wrap: wrap; gap: 15px; font-size: 11px; margin-bottom: 10px; padding: 6px; border: 1px solid #000; }
+
+    /* Structural protection to ensure card layout renders cleanly regardless of theme rules */
+    .print-container, 
+    .print-container * {
+        color: #000000 !important;         
+        border-color: #000000 !important;  
+    }
+    .print-container th { background-color: #f5f5f5 !important; }
+    .sf10-header-info { background-color: #f9f9f9 !important; }
+    .sf10-block { background-color: #ffffff !important; }
+    .print-container span[style*="color"],
+    .print-container p[style*="color"] { color: #222222 !important; }
 
     @media print {
         .header, .ambient-glow-1, .ambient-glow-2, .no-print, .search-container, .view-switcher-bar { display: none !important; }
-        body { background: #ffffff; color: #000000; padding: 0; }
+        body { background: #ffffff !important; color: #000000 !important; padding: 0; }
         .container { margin: 0; padding: 0; max-width: 100%; }
         .card-panel, .report-card { border: none !important; box-shadow: none !important; background: transparent !important; padding: 0 !important; margin: 0 !important; }
     }
@@ -227,7 +311,7 @@ if ($student_id > 0) {
     <h3>Matching Student Records Found</h3>
     <div style="display: flex; flex-direction: column; gap: 8px;">
         <?php foreach ($search_results as $result): 
-            $student_no = htmlspecialchars($result['student_id'] ?? '');
+            $student_no = htmlspecialchars($result['school_id_number'] ?? '');
             $last = !empty($result['last_name']) ? htmlspecialchars($result['last_name']) : htmlspecialchars($result['name'] ?? '');
             $first = !empty($result['first_name']) ? htmlspecialchars($result['first_name']) : '';
             $section = !empty($result['section']) ? htmlspecialchars($result['section']) : 'No Section';
@@ -236,7 +320,7 @@ if ($student_id > 0) {
             <div class="result-item">
                 <a href="?student_id=<?php echo $result['id']; ?>&school_year=<?php echo urlencode($school_year); ?>&view=<?php echo $current_view; ?>">
                     <?php echo $student_no; ?> - <?php echo $full_name; ?> - <?php echo $section; ?>
-                    <span style="float: right; font-size: 12px; background: rgba(0, 180, 216, 0.1); color: var(--text-subtitle); padding: 2px 8px; border-radius: 4px;">Grade <?php echo htmlspecialchars($result['grade_level'] ?? ''); ?></span>
+                    <span style="float: right; font-size: 12px; background: rgba(0, 180, 216, 0.1); color: #00b4d8; padding: 2px 8px; border-radius: 4px;">Grade <?php echo htmlspecialchars($result['grade_level'] ?? ''); ?></span>
                 </a>
             </div>
         <?php endforeach; ?>
@@ -244,7 +328,7 @@ if ($student_id > 0) {
 </div>
 <?php elseif (!empty($search) && empty($search_results)): ?>
 <div class="search-results no-print">
-    <p style="color: var(--text-muted); font-size: 14px; margin: 0;">No matching student records found for "<?php echo htmlspecialchars($search); ?>".</p>
+    <p style="font-size: 14px; margin: 0; opacity: 0.8;">No matching student records found for "<?php echo htmlspecialchars($search); ?>".</p>
 </div>
 <?php endif; ?>
 
@@ -445,7 +529,7 @@ if ($student_id > 0) {
 
     <?php elseif ($current_view === 'sf10'): ?>
         <div class="toolbar no-print">
-            <span style="font-size: 13px; color: var(--text-muted); font-weight: 500;">📋 Learner Permanent Academic Record Architecture (Official Transcript Layout)</span>
+            <span style="font-size: 13px; font-weight: 500; opacity: 0.8;">📋 Learner Permanent Academic Record Architecture (Official Transcript Layout)</span>
             <button onclick="window.print()" class="btn-print" style="margin-left: auto;">🖨️ Print SF10 Sheet</button>
         </div>
 
@@ -464,7 +548,7 @@ if ($student_id > 0) {
                 <div style="flex: 1 1 25%;"><strong>LAST NAME:</strong> <?php echo htmlspecialchars($student['last_name'] ?? ($student['name'] ?? '')); ?></div>
                 <div style="flex: 1 1 25%;"><strong>FIRST NAME:</strong> <?php echo htmlspecialchars($student['first_name'] ?? ''); ?></div>
                 <div style="flex: 1 1 25%;"><strong>LRN:</strong> <?php echo htmlspecialchars($student['lrn'] ?? 'N/A'); ?></div>
-                <div style="flex: 1 1 20%;"><strong>STUDENT ID:</strong> <?php echo htmlspecialchars($student['student_id'] ?? 'N/A'); ?></div>
+                <div style="flex: 1 1 20%;"><strong>STUDENT ID:</strong> <?php echo htmlspecialchars($student['school_id_number'] ?? 'N/A'); ?></div>
                 <div style="flex: 1 1 25%;"><strong>SEX:</strong> <?php echo htmlspecialchars($student['gender'] ?? 'Not Tracked'); ?></div>
                 <div style="flex: 1 1 40%;"><strong>CURRICULUM CONFIGURATION:</strong> K-to-12 Basic Education Framework</div>
             </div>

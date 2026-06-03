@@ -22,24 +22,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $term_suffix = "1"; 
             $prefix = $current_year . $term_suffix . "-";
             
-            $stmt = $pdo->prepare("SELECT student_id FROM students WHERE student_id LIKE ? ORDER BY student_id DESC LIMIT 1");
+            // Fixed: changed student_id to school_id_number
+            $stmt = $pdo->prepare("SELECT school_id_number FROM students WHERE school_id_number LIKE ? ORDER BY school_id_number DESC LIMIT 1");
             $stmt->execute([$prefix . '%']);
             $last_student = $stmt->fetch();
             
             if ($last_student) {
-                $parts = explode('-', $last_student['student_id']);
+                $parts = explode('-', $last_student['school_id_number']);
                 $next_sequence = intval($parts[1]) + 1;
             } else {
                 $next_sequence = 1;
             }
             
-            $generated_student_id = $prefix . str_pad($next_sequence, 5, '0', STR_PAD_LEFT);
-            
+            $generated_id = $prefix . str_pad($next_sequence, 5, '0', STR_PAD_LEFT);
             $full_name = trim($_POST['last_name']) . ', ' . trim($_POST['first_name']);
             
-            $stmt = $pdo->prepare("INSERT INTO students (student_id, lrn, name, first_name, last_name, birth_date, gender, grade_level, section) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            // Fixed: changed student_id to school_id_number
+            $stmt = $pdo->prepare("INSERT INTO students (school_id_number, lrn, name, first_name, last_name, birth_date, gender, grade_level, section) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([
-                $generated_student_id, 
+                $generated_id, 
                 $lrn,
                 $full_name, 
                 $_POST['first_name'], 
@@ -49,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $_POST['grade_level'], 
                 $_POST['section']
             ]);
-            $message = "Student added successfully! Generated ID: " . $generated_student_id;
+            $message = "Student added successfully! Generated ID: " . $generated_id;
             $message_type = "success";
         }
     } elseif (isset($_POST['edit'])) {
@@ -61,9 +62,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         } else {
             $full_name = trim($_POST['last_name']) . ', ' . trim($_POST['first_name']);
             
-            $stmt = $pdo->prepare("UPDATE students SET student_id = ?, lrn = ?, name = ?, first_name = ?, last_name = ?, birth_date = ?, gender = ?, grade_level = ?, section = ? WHERE id = ?");
+            // Fixed: changed student_id column to school_id_number
+            $stmt = $pdo->prepare("UPDATE students SET school_id_number = ?, lrn = ?, name = ?, first_name = ?, last_name = ?, birth_date = ?, gender = ?, grade_level = ?, section = ? WHERE id = ?");
             $stmt->execute([
-                $_POST['student_id'], 
+                $_POST['student_id'], // We keep the form name 'student_id' but map it to 'school_id_number'
                 $lrn,
                 $full_name, 
                 $_POST['first_name'], 
@@ -90,7 +92,8 @@ if (isset($_GET['delete'])) {
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 if (!empty($search)) {
     $like = "%$search%";
-    $stmt = $pdo->prepare("SELECT * FROM students WHERE name LIKE ? OR first_name LIKE ? OR last_name LIKE ? OR student_id LIKE ? OR lrn LIKE ? OR section LIKE ? ORDER BY last_name, first_name");
+    // Fixed: changed student_id to school_id_number in search query
+    $stmt = $pdo->prepare("SELECT * FROM students WHERE name LIKE ? OR first_name LIKE ? OR last_name LIKE ? OR school_id_number LIKE ? OR lrn LIKE ? OR section LIKE ? ORDER BY last_name, first_name");
     $stmt->execute([$like, $like, $like, $like, $like, $like]);
     $students = $stmt->fetchAll();
 } else {
@@ -193,7 +196,7 @@ if (!empty($search)) {
             <tbody>
                 <?php foreach ($students as $s): ?>
                 <tr>
-                    <td style="font-weight: 600; color: var(--text-subtitle);"><?php echo htmlspecialchars($s['student_id']); ?></td>
+                    <td style="font-weight: 600; color: var(--text-subtitle);"><?php echo htmlspecialchars($s['school_id_number']); ?></td>
                     <td style="color: var(--text-muted); font-size: 13px;"><?php echo htmlspecialchars($s['lrn'] ?? 'N/A'); ?></td>
                     <td style="text-align: left; padding-left: 12px; font-weight: 500;"><?php echo htmlspecialchars($s['last_name'] ?? ''); ?></td>
                     <td style="text-align: left; padding-left: 12px; font-weight: 500;"><?php echo htmlspecialchars($s['first_name'] ?? ''); ?></td>
@@ -202,7 +205,7 @@ if (!empty($search)) {
                     <td>Grade <?php echo htmlspecialchars($s['grade_level']); ?></td>
                     <td><span style="font-weight: 600; color: var(--text-title);"><?php echo htmlspecialchars($s['section']); ?></span></td>
                     <td>
-                        <a href="#" class="edit" onclick="openEditModal(<?php echo $s['id']; ?>, '<?php echo addslashes($s['student_id']); ?>', '<?php echo addslashes($s['lrn'] ?? ''); ?>', '<?php echo addslashes($s['first_name'] ?? ''); ?>', '<?php echo addslashes($s['last_name'] ?? ''); ?>', '<?php echo $s['birth_date'] ?? ''; ?>', '<?php echo addslashes($s['gender'] ?? 'Male'); ?>', '<?php echo $s['grade_level']; ?>', '<?php echo addslashes($s['section']); ?>')">Edit</a>
+                        <a href="#" class="edit" onclick="openEditModal(<?php echo $s['id']; ?>, '<?php echo addslashes($s['school_id_number']); ?>', '<?php echo addslashes($s['lrn'] ?? ''); ?>', '<?php echo addslashes($s['first_name'] ?? ''); ?>', '<?php echo addslashes($s['last_name'] ?? ''); ?>', '<?php echo $s['birth_date'] ?? ''; ?>', '<?php echo addslashes($s['gender'] ?? 'Male'); ?>', '<?php echo $s['grade_level']; ?>', '<?php echo addslashes($s['section']); ?>')">Edit</a>
                         <a href="?delete=<?php echo $s['id']; ?>" class="delete" onclick="return confirm('Are you sure you want to remove this student record?')">Delete</a>
                     </td>
                 </tr>
@@ -281,9 +284,9 @@ if (!empty($search)) {
 </div>
 
 <script>
-function openEditModal(id, student_id, lrn, first_name, last_name, birth_date, gender, grade_level, section) {
+function openEditModal(id, school_id_number, lrn, first_name, last_name, birth_date, gender, grade_level, section) {
     document.getElementById('edit_id').value = id;
-    document.getElementById('edit_student_id').value = student_id;
+    document.getElementById('edit_student_id').value = school_id_number;
     document.getElementById('edit_lrn').value = lrn;
     document.getElementById('edit_first_name').value = first_name;
     document.getElementById('edit_last_name').value = last_name;

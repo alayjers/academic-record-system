@@ -71,10 +71,20 @@ if (empty($selected_section) && !empty($valid_sections_for_grade)) {
     $selected_section = $valid_sections_for_grade[0];
 }
 
-if (!empty($selected_section) && !in_array($selected_section, $valid_sections_for_grade) && $role != 'admin') {
-    $selected_section = '';
-    $message = "You do not have access to that section within this Grade Level.";
-    $message_type = "error";
+$has_access = ($role == 'admin' || in_array($selected_section, $valid_sections_for_grade));
+
+// PRODUCTION FIX: Hard stop for unauthorized access attempts
+if (!$has_access && !empty($selected_section)) {
+    // Log the unauthorized attempt for the admin
+    $details = "Unauthorized access attempt by User ID $user_id to Section: $selected_section";
+    $audit = $pdo->prepare("INSERT INTO audit_log (user_id, action, details) VALUES (?, 'UNAUTHORIZED_ACCESS', ?)");
+    $audit->execute([$user_id, $details]);
+
+    die("<div style='font-family:sans-serif; text-align:center; margin-top:50px;'>
+            <h2 style='color:#e63946;'>Access Denied</h2>
+            <p>You are not authorized to view or edit grades for this section.</p>
+            <a href='dashboard.php' style='color:#40916c; font-weight:600;'>Return to Dashboard</a>
+         </div>");
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['save_grades'])) {
@@ -94,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['save_grades'])) {
             }
         }
     }
-    
+  
     if (isset($_POST['score'])) {
         foreach ($_POST['score'] as $student_id => $assignments) {
             if (empty($student_id) || !is_numeric($student_id)) continue;
@@ -115,7 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['save_grades'])) {
                         $stmt->execute([$score, $student_id, $assignment_id, $selected_semester]);
                     } else {
                         $stmt = $pdo->prepare("INSERT INTO scores (student_id, assignment_id, score, semester) VALUES (?, ?, ?, ?)");
-                        $stmt->execute([$score, $student_id, $assignment_id, $selected_semester]);
+                    $stmt->execute([$student_id, $assignment_id, $score, $selected_semester]);
                     }
                     
                     if ($old_score != $score) {
@@ -199,11 +209,10 @@ $students_male = [];
 $students_female = [];
 
 if ($selected_section && $selected_grade) {
-    $stmt = $pdo->prepare("SELECT * FROM students WHERE grade_level = ? AND section = ? AND (gender = 'Male' OR gender IS NULL OR gender = '') ORDER BY last_name, first_name");
-    $stmt->execute([$selected_grade, $selected_section]);
+    $stmt = $pdo->prepare("SELECT * FROM students WHERE grade_level = ? AND section = ? AND (UPPER(gender) = 'MALE' OR gender IS NULL OR gender = '') ORDER BY last_name, first_name");    $stmt->execute([$selected_grade, $selected_section]);
     $students_male = $stmt->fetchAll();
 
-    $stmt = $pdo->prepare("SELECT * FROM students WHERE grade_level = ? AND section = ? AND gender = 'Female' ORDER BY last_name, first_name");
+    $stmt = $pdo->prepare("SELECT * FROM students WHERE grade_level = ? AND section = ? AND UPPER(gender) = 'FEMALE' ORDER BY last_name, first_name");
     $stmt->execute([$selected_grade, $selected_section]);
     $students_female = $stmt->fetchAll();
 }
@@ -434,17 +443,17 @@ foreach ($all_students as $student) {
                             <td colspan="2" style="text-align: left; font-weight: bold; color: var(--text-title); padding-left: 12px;">Highest Possible Score</td>
                             
                             <?php foreach($written as $w): ?>
-                                <td><input type="number" name="max_score[<?php echo $w['id']; ?>]" value="<?php echo htmlspecialchars($w['max_score']); ?>" step="1"></td>
+                                <td><input type="number" name="max_score[<?php echo $w['id']; ?>]" value="<?php echo htmlspecialchars($w['max_score']); ?>" step="1" min="1" ></td>
                             <?php endforeach; ?>
                             <td class="cell-calc"><?php echo $hps_ww_total; ?></td><td class="cell-calc">100.00</td><td class="cell-calc">20%</td>
                             
                             <?php foreach($performance as $p): ?>
-                                <td><input type="number" name="max_score[<?php echo $p['id']; ?>]" value="<?php echo htmlspecialchars($p['max_score']); ?>" step="1"></td>
+                                <td><input type="number" name="max_score[<?php echo $p['id']; ?>]" value="<?php echo htmlspecialchars($p['max_score']); ?>" step="1" min="1" ></td>
                             <?php endforeach; ?>
                             <td class="cell-calc"><?php echo $hps_pt_total; ?></td><td class="cell-calc">100.00</td><td class="cell-calc">50%</td>
                             
                             <?php foreach($exams as $e): ?>
-                                <td><input type="number" name="max_score[<?php echo $e['id']; ?>]" value="<?php echo htmlspecialchars($e['max_score']); ?>" step="1"></td>
+                                <td><input type="number" name="max_score[<?php echo $e['id']; ?>]" value="<?php echo htmlspecialchars($e['max_score']); ?>" step="1" min="1" ></td>
                             <?php endforeach; ?>
                             <td class="cell-calc"><?php echo $hps_st_total; ?></td><td class="cell-calc">100.00</td><td class="cell-calc">30%</td>
                             
@@ -468,21 +477,21 @@ foreach ($all_students as $student) {
                                 <td style="text-align: left; min-width: 180px; font-weight: 600; padding-left: 12px; border-right: 2px solid var(--border-card);"><?php echo htmlspecialchars($student['name']); ?></td>
                                 
                                 <?php foreach($written as $w): ?>
-                                    <td><input type="number" name="score[<?php echo $sid; ?>][<?php echo $w['id']; ?>]" value="<?php echo htmlspecialchars($data['ww_scores'][$w['id']] ?? ''); ?>" step="0.5"></td>
+                                    <td><input type="number" name="score[<?php echo $sid; ?>][<?php echo $w['id']; ?>]" value="<?php echo htmlspecialchars($data['ww_scores'][$w['id']] ?? ''); ?>" step="0.5" min="0" max="<?php echo $w['max_score']; ?>"></td>
                                 <?php endforeach; ?>
                                 <td class="cell-calc"><?php echo number_format($data['ww_calc']['total'], 1); ?></td>
                                 <td class="cell-calc"><?php echo number_format($data['ww_calc']['ps'], 2); ?></td>
                                 <td class="cell-calc" style="border-right: 2px solid var(--border-card);"><?php echo number_format($data['ww_calc']['ws'], 2); ?></td>
                                 
                                 <?php foreach($performance as $p): ?>
-                                    <td><input type="number" name="score[<?php echo $sid; ?>][<?php echo $p['id']; ?>]" value="<?php echo htmlspecialchars($data['pt_scores'][$p['id']] ?? ''); ?>" step="0.5"></td>
+                                    <td><input type="number" name="score[<?php echo $sid; ?>][<?php echo $p['id']; ?>]" value="<?php echo htmlspecialchars($data['pt_scores'][$p['id']] ?? ''); ?>" step="0.5" min="0" max="<?php echo $p['max_score']; ?>"></td>
                                 <?php endforeach; ?>
                                 <td class="cell-calc"><?php echo number_format($data['pt_calc']['total'], 1); ?></td>
                                 <td class="cell-calc"><?php echo number_format($data['pt_calc']['ps'], 2); ?></td>
                                 <td class="cell-calc" style="border-right: 2px solid var(--border-card);"><?php echo number_format($data['pt_calc']['ws'], 2); ?></td>
                                 
                                 <?php foreach($exams as $e): ?>
-                                    <td><input type="number" name="score[<?php echo $sid; ?>][<?php echo $e['id']; ?>]" value="<?php echo htmlspecialchars($data['st_scores'][$e['id']] ?? ''); ?>" step="0.5"></td>
+                                    <td><input type="number" name="score[<?php echo $sid; ?>][<?php echo $e['id']; ?>]" value="<?php echo htmlspecialchars($data['st_scores'][$e['id']] ?? ''); ?>" step="0.5" min="0" max="<?php echo $e['max_score']; ?>"></td>
                                 <?php endforeach; ?>
                                 <td class="cell-calc"><?php echo number_format($data['st_calc']['total'], 1); ?></td>
                                 <td class="cell-calc"><?php echo number_format($data['st_calc']['ps'], 2); ?></td>
@@ -512,21 +521,21 @@ foreach ($all_students as $student) {
                                 <td style="text-align: left; min-width: 180px; font-weight: 600; padding-left: 12px; border-right: 2px solid var(--border-card);"><?php echo htmlspecialchars($student['name']); ?></td>
                                 
                                 <?php foreach($written as $w): ?>
-                                    <td><input type="number" name="score[<?php echo $sid; ?>][<?php echo $w['id']; ?>]" value="<?php echo htmlspecialchars($data['ww_scores'][$w['id']] ?? ''); ?>" step="0.5"></td>
+                                    <td><input type="number" name="score[<?php echo $sid; ?>][<?php echo $w['id']; ?>]" value="<?php echo htmlspecialchars($data['ww_scores'][$w['id']] ?? ''); ?>" step="0.5" min="0" max="<?php echo $w['max_score']; ?>"></td>
                                 <?php endforeach; ?>
                                 <td class="cell-calc"><?php echo number_format($data['ww_calc']['total'], 1); ?></td>
                                 <td class="cell-calc"><?php echo number_format($data['ww_calc']['ps'], 2); ?></td>
                                 <td class="cell-calc" style="border-right: 2px solid var(--border-card);"><?php echo number_format($data['ww_calc']['ws'], 2); ?></td>
                                 
                                 <?php foreach($performance as $p): ?>
-                                    <td><input type="number" name="score[<?php echo $sid; ?>][<?php echo $p['id']; ?>]" value="<?php echo htmlspecialchars($data['pt_scores'][$p['id']] ?? ''); ?>" step="0.5"></td>
+                                    <td><input type="number" name="score[<?php echo $sid; ?>][<?php echo $p['id']; ?>]" value="<?php echo htmlspecialchars($data['pt_scores'][$p['id']] ?? ''); ?>" step="0.5" min="0" max="<?php echo $p['max_score']; ?>"></td>
                                 <?php endforeach; ?>
                                 <td class="cell-calc"><?php echo number_format($data['pt_calc']['total'], 1); ?></td>
                                 <td class="cell-calc"><?php echo number_format($data['pt_calc']['ps'], 2); ?></td>
                                 <td class="cell-calc" style="border-right: 2px solid var(--border-card);"><?php echo number_format($data['pt_calc']['ws'], 2); ?></td>
                                 
                                 <?php foreach($exams as $e): ?>
-                                    <td><input type="number" name="score[<?php echo $sid; ?>][<?php echo $e['id']; ?>]" value="<?php echo htmlspecialchars($data['st_scores'][$e['id']] ?? ''); ?>" step="0.5"></td>
+                                    <td><input type="number" name="score[<?php echo $sid; ?>][<?php echo $e['id']; ?>]" value="<?php echo htmlspecialchars($data['st_scores'][$e['id']] ?? ''); ?>" step="0.5" min="0" max="<?php echo $e['max_score']; ?>"></td>
                                 <?php endforeach; ?>
                                 <td class="cell-calc"><?php echo number_format($data['st_calc']['total'], 1); ?></td>
                                 <td class="cell-calc"><?php echo number_format($data['st_calc']['ps'], 2); ?></td>
