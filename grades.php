@@ -282,6 +282,33 @@ foreach ($all_students as $student) {
 ?>
 
 <style>
+    /* Force page to fill entire screen */
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .content-wrapper {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .container {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 15px !important;
+        border-radius: 0 !important;
+    }
+
+    .card-panel {
+        width: 100% !important;
+        box-sizing: border-box;
+    }
+
+    /* Original styles preserved below */
     .tabs-wrapper { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
     .tab-link { padding: 10px 18px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); text-decoration: none; color: var(--text-muted); border-radius: 8px; font-weight: 600; font-size: 13px; transition: all 0.2s; }
     .tab-link:hover, .tab-link.active { background: var(--mode-btn-bg); border-color: var(--mode-btn-border); color: var(--mode-btn-text); }
@@ -290,7 +317,6 @@ foreach ($all_students as $student) {
     .tab-link.grade-btn { background: rgba(0, 180, 216, 0.05); color: #00d9ff; border-color: rgba(0, 180, 216, 0.2); }
     .tab-link.grade-btn.active { background: #00b4d8; color: #ffffff; border-color: #00b4d8; }
 
-    /* New Styling Indicators specifically for Advisory Buttons */
     .tab-link.advisory-badge {
         border-color: rgba(21, 128, 61, 0.3) !important;
         background: rgba(21, 128, 61, 0.06) !important;
@@ -315,20 +341,12 @@ foreach ($all_students as $student) {
     .th-green { background-color: #15803d; color: #ffffff !important; }
     
     .row-hps { background-color: rgba(0, 0, 0, 0.04); }
-    [data-theme="dark"] .row-hps, .dark-mode .row-hps { background-color: rgba(255, 255, 255, 0.05); }
-    
     .gender-header-row { background-color: rgba(0, 180, 216, 0.08); font-weight: 700; text-align: left; color: #00b4d8; font-size: 13px; }
-    
     .cell-calc { font-weight: 600; background-color: rgba(0, 0, 0, 0.04); color: var(--text-title); }
-    [data-theme="dark"] .cell-calc, .dark-mode .cell-calc { background-color: rgba(255, 255, 255, 0.04); }
-    
     .cell-warning { background-color: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; }
-    
     .text-highlight { color: #1d4ed8; font-weight: 700; }
-    [data-theme="dark"] .text-highlight, .dark-mode .text-highlight { color: #38bdf8; }
     
     .deped-grade-table input[type="number"] { background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 6px; color: var(--input-text); padding: 4px; width: 48px; text-align: center; }
-    .deped-grade-table input[type="number"]:focus { border-color: #38bdf8; outline: none; }
 </style>
 
 <h1>DepEd Class Record</h1>
@@ -357,9 +375,6 @@ foreach ($all_students as $student) {
             Section <?php echo htmlspecialchars($sec); ?> <?php echo $is_advisory ? '(Advisory)' : ''; ?>
         </a>
     <?php endforeach; ?>
-    <?php if (empty($allowed_grades)): ?>
-        <p style="color: #f87171; font-weight: 500;">No assigned grade configurations mapped to your profile.</p>
-    <?php endif; ?>
 </div>
 
 <div class="card-panel toolbar-panel">
