@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         
         if ($assignment_type == 'subject') {
             $check = $pdo->prepare("SELECT id FROM teacher_subject_section WHERE teacher_id = ? AND section = ? AND subject = ?");
-            $check->execute([$teacher_id, $section, $subject]);
+            $check->execute([$teacher_id, $section, $subject_id]);
             if ($check->fetch()) {
                 $message = "Teacher already assigned to $section for $subject.";
                 $message_type = "error";
@@ -314,7 +314,7 @@ body.dark-mode .btn-secondary:hover {
             
             <div class="form-group" id="subject_field_wrapper">
                 <label>Subject</label>
-                <input type="text" name="subject" id="subject_field" placeholder="e.g., Mathematics">
+                <input type="text" name="subject_id" id="subject_field" placeholder="e.g., Mathematics">
             </div>
             
             <div class="modal-footer">
