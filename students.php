@@ -156,7 +156,7 @@ if (!empty($search)) {
         
         <div style="display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 120px;">
             <label style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Section</label>
-            <input type="text" name="section" placeholder="e.g., Diamond" required style="width: 100%;">
+            <input type="text" name="section" placeholder="e.g., 1-A, 1-B.." required style="width: 100%;">
         </div>
         
         <button type="submit" style="height: 45px; padding: 0 24px;">Add Student</button>

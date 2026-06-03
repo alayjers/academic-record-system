@@ -7,25 +7,49 @@ $user_id = $_SESSION['user_id'];
 $role = $_SESSION['role'];
 $teacher_name = $_SESSION['name'] ?? 'Teacher';
 
+$allowed_data = [];
+$advisory_sections = []; 
+
 if ($role == 'admin') {
     $stmt = $pdo->query("SELECT DISTINCT grade_level, section FROM students WHERE section IS NOT NULL AND section != '' ORDER BY grade_level ASC, section ASC");
     $allowed_data = $stmt->fetchAll();
-} elseif ($role == 'advisory_teacher') {
-    $stmt = $pdo->prepare("SELECT DISTINCT s.grade_level, s.section FROM advisory_section a JOIN students s ON a.section = s.section WHERE a.teacher_id = ? ORDER BY s.grade_level ASC, s.section ASC");
-    $stmt->execute([$user_id]);
-    $allowed_data = $stmt->fetchAll();
-} elseif ($role == 'subject_teacher') {
-    $stmt = $pdo->prepare("SELECT DISTINCT s.grade_level, tss.section FROM teacher_subject_section tss JOIN students s ON tss.section = s.section WHERE tss.teacher_id = ? ORDER BY s.grade_level ASC, s.section ASC");
-    $stmt->execute([$user_id]);
-    $allowed_data = $stmt->fetchAll();
 } else {
-    $allowed_data = [];
+    $adv_stmt = $pdo->prepare("SELECT DISTINCT s.grade_level, s.section FROM advisory_section a JOIN students s ON a.section = s.section WHERE a.teacher_id = ?");
+    $adv_stmt->execute([$user_id]);
+    $advisory_rows = $adv_stmt->fetchAll();
+    
+    foreach ($advisory_rows as $row) {
+        $advisory_sections[] = $row['section'];
+        $allowed_data[] = $row;
+    }
+
+    $sub_stmt = $pdo->prepare("SELECT DISTINCT s.grade_level, tss.section FROM teacher_subject_section tss JOIN students s ON tss.section = s.section WHERE tss.teacher_id = ?");
+    $sub_stmt->execute([$user_id]);
+    $subject_rows = $sub_stmt->fetchAll();
+    
+    foreach ($subject_rows as $row) {
+        $already_added = false;
+        foreach ($allowed_data as $existing) {
+            if ($existing['grade_level'] == $row['grade_level'] && $existing['section'] == $row['section']) {
+                $already_added = true;
+                break;
+            }
+        }
+        if (!$already_added) {
+            $allowed_data[] = $row;
+        }
+    }
 }
 
 $grade_sections_map = [];
 foreach ($allowed_data as $row) {
     if (!empty($row['grade_level'])) {
-        $grade_sections_map[$row['grade_level']][] = $row['section'];
+        if (!isset($grade_sections_map[$row['grade_level']])) {
+            $grade_sections_map[$row['grade_level']] = [];
+        }
+        if (!in_array($row['section'], $grade_sections_map[$row['grade_level']])) {
+            $grade_sections_map[$row['grade_level']][] = $row['section'];
+        }
     }
 }
 
@@ -263,8 +287,20 @@ foreach ($all_students as $student) {
     .tab-link:hover, .tab-link.active { background: var(--mode-btn-bg); border-color: var(--mode-btn-border); color: var(--mode-btn-text); }
     
     .grade-badge-container { border-bottom: 1px solid var(--border-card); padding-bottom: 14px; margin-bottom: 16px; }
-    .tab-link.grade-btn { background: rgba(0, 180, 216, 0.05); color: #00b4d8; border-color: rgba(0, 180, 216, 0.2); }
+    .tab-link.grade-btn { background: rgba(0, 180, 216, 0.05); color: #00d9ff; border-color: rgba(0, 180, 216, 0.2); }
     .tab-link.grade-btn.active { background: #00b4d8; color: #ffffff; border-color: #00b4d8; }
+
+    /* New Styling Indicators specifically for Advisory Buttons */
+    .tab-link.advisory-badge {
+        border-color: rgba(21, 128, 61, 0.3) !important;
+        background: rgba(21, 128, 61, 0.06) !important;
+        color: #22c55e !important;
+    }
+    .tab-link.advisory-badge.active {
+        background: #16a34a !important;
+        border-color: #16a34a !important;
+        color: #ffffff !important;
+    }
 
     .toolbar-panel { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
     
@@ -311,10 +347,14 @@ foreach ($all_students as $student) {
 </div>
 
 <div class="tabs-wrapper">
-    <?php foreach ($valid_sections_for_grade as $sec): ?>
+    <?php foreach ($valid_sections_for_grade as $sec): 
+        $is_advisory = in_array($sec, $advisory_sections);
+        $badge_class = $is_advisory ? 'advisory-badge' : '';
+        $active_class = ($selected_section == $sec) ? 'active' : '';
+    ?>
         <a href="?grade_level=<?php echo $selected_grade; ?>&section=<?php echo urlencode($sec); ?>&semester=<?php echo $selected_semester; ?>" 
-           class="tab-link <?php echo $selected_section == $sec ? 'active' : ''; ?>">
-            Section <?php echo htmlspecialchars($sec); ?>
+           class="tab-link <?php echo $badge_class; ?> <?php echo $active_class; ?>">
+            Section <?php echo htmlspecialchars($sec); ?> <?php echo $is_advisory ? '(Advisory)' : ''; ?>
         </a>
     <?php endforeach; ?>
     <?php if (empty($allowed_grades)): ?>
