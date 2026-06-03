@@ -249,7 +249,6 @@ if (isset($_SESSION['user_id'])) {
 
     <div class="theme-switcher">
         <button class="theme-toggle-btn" id="themeToggle">
-            <span id="themeIcon">☀️</span>
             <span id="themeText">Light Mode</span>
         </button>
     </div>
@@ -289,7 +288,6 @@ if (isset($_SESSION['user_id'])) {
             const currentTheme = localStorage.getItem('theme') || 'light';
             if (currentTheme === 'dark') {
                 document.documentElement.setAttribute('data-theme', 'dark');
-                themeIcon.textContent = '🌙';
                 themeText.textContent = 'Dark Mode';
             }
 
@@ -297,12 +295,10 @@ if (isset($_SESSION['user_id'])) {
                 let theme = 'light';
                 if (document.documentElement.getAttribute('data-theme') !== 'dark') {
                     document.documentElement.setAttribute('data-theme', 'dark');
-                    themeIcon.textContent = '🌙';
                     themeText.textContent = 'Dark Mode';
                     theme = 'dark';
                 } else {
                     document.documentElement.removeAttribute('data-theme');
-                    themeIcon.textContent = '☀️';
                     themeText.textContent = 'Light Mode';
                 }
                 localStorage.setItem('theme', theme);

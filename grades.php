@@ -399,7 +399,7 @@ foreach ($all_students as $student) {
         </select>
     </form>
     <?php if (!empty($all_students)): ?>
-        <button type="submit" form="classRecordForm" name="save_grades" class="save-btn">💾 Save All Grades</button>
+        <button type="submit" form="classRecordForm" name="save_grades" class="save-btn"> Save All Grades</button>
     <?php endif; ?>
 </div>
 

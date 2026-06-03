@@ -338,8 +338,8 @@ if ($student_id > 0) {
     $student_display_name = (!empty($student['last_name']) && !empty($student['first_name'])) ? $student['last_name'] . ', ' . $student['first_name'] : ($student['name'] ?? '');
 ?>
 <div class="view-switcher-bar no-print">
-    <a href="?student_id=<?php echo $student_id; ?>&school_year=<?php echo urlencode($school_year); ?>&view=sf9" class="view-tab <?php echo $current_view === 'sf9' ? 'active' : ''; ?>">📄 SF9 (Report Card)</a>
-    <a href="?student_id=<?php echo $student_id; ?>&school_year=<?php echo urlencode($school_year); ?>&view=sf10" class="view-tab <?php echo $current_view === 'sf10' ? 'active' : ''; ?>">📜 SF10 (Permanent Record)</a>
+    <a href="?student_id=<?php echo $student_id; ?>&school_year=<?php echo urlencode($school_year); ?>&view=sf9" class="view-tab <?php echo $current_view === 'sf9' ? 'active' : ''; ?>"> SF9 (Report Card)</a>
+    <a href="?student_id=<?php echo $student_id; ?>&school_year=<?php echo urlencode($school_year); ?>&view=sf10" class="view-tab <?php echo $current_view === 'sf10' ? 'active' : ''; ?>"> SF10 (Permanent Record)</a>
 </div>
 
 <div class="report-card">
@@ -354,7 +354,7 @@ if ($student_id > 0) {
                 </div>
                 <button type="submit" class="btn-print btn-secondary">Update SY Framework</button>
             </form>
-            <button onclick="window.print()" class="btn-print">🖨️ Print SF9 Card</button>
+            <button onclick="window.print()" class="btn-print"> Print SF9 Card</button>
         </div>
 
         <div class="print-container">
@@ -531,8 +531,8 @@ if ($student_id > 0) {
 
     <?php elseif ($current_view === 'sf10'): ?>
         <div class="toolbar no-print">
-            <span style="font-size: 13px; font-weight: 500; opacity: 0.8;">📋 Learner Permanent Academic Record Architecture (Official Transcript Layout)</span>
-            <button onclick="window.print()" class="btn-print" style="margin-left: auto;">🖨️ Print SF10 Sheet</button>
+            <span style="font-size: 13px; font-weight: 500; opacity: 0.8;"> Learner Permanent Academic Record Architecture (Official Transcript Layout)</span>
+            <button onclick="window.print()" class="btn-print" style="margin-left: auto;"> Print SF10 Sheet</button>
         </div>
 
         <div class="print-container">

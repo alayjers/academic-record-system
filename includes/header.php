@@ -31,7 +31,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <a href="grades.php" class="<?php echo $current_page == 'grades.php' ? 'active' : ''; ?>">Grade Entry</a>
             <a href="report_card.php" class="<?php echo $current_page == 'report_card.php' ? 'active' : ''; ?>">Report Card</a>
             <button class="theme-toggle-btn" id="themeToggle" style="margin-left: 8px;">
-                <span id="themeIcon">☀️</span>
                 <span id="themeText">Light Mode</span>
             </button>
             <a href="logout.php" class="logout-btn" style="margin-left: 8px;">Sign Out</a>
