@@ -157,11 +157,11 @@ $advisory_assignments = $stmt->fetchAll();
             <input type="hidden" name="action_type" value="create_teacher">
             <div class="form-group">
                 <label>Full Name</label>
-                <input type="text" name="full_name" placeholder="e.g., Mr. John Doe" required>
+                <input type="text" name="full_name" placeholder="e.g., Mr. John Teacher" required>
             </div>
             <div class="form-group">
                 <label>Username (For Login)</label>
-                <input type="text" name="username" placeholder="e.g., johndoe01" required>
+                <input type="text" name="username" placeholder="e.g., john_teacher" required>
             </div>
             <div class="form-group">
                 <label>Password</label>
