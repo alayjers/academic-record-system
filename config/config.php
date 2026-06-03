@@ -1,28 +1,25 @@
 <?php
-// ============================================
-// DATABASE CONFIGURATION - RAILWAY DEPLOYMENT
-// ============================================
+// Database connection for Railway + Local
+$railway_db_url = getenv('DATABASE_URL');
 
-// Get database URL from Railway environment variable
-$db_url = getenv('DATABASE_URL');
-
-if ($db_url) {
-    // Parse Railway's DATABASE_URL (postgresql://...)
-    // For MySQL, Railway provides MYSQL_URL
-    $db_host = getenv('MYSQL_HOST') ?: 'localhost';
-    $db_name = getenv('MYSQL_DATABASE') ?: 'academic_system';
-    $db_user = getenv('MYSQL_USER') ?: 'root';
-    $db_pass = getenv('MYSQL_PASSWORD') ?: '';
+if ($railway_db_url) {
+    // Running on Railway
+    $parsed = parse_url($railway_db_url);
+    $db_host = $parsed['mysql.railway.internal'];
+    $db_port = $parsed['port'] ?? 3306;
+    $db_user = $parsed['root'];
+    $db_pass = $parsed['FLExurmFuEiXUJmMiCFwStcBurNCHFXb'] ?? '';
+    $db_name = ltrim($parsed['path'], '/');
+    $dsn = "mysql:host=$db_host;port=$db_port;dbname=$db_name";
 } else {
-    // Local development fallback
-    $db_host = 'localhost';
-    $db_name = 'academic_system';
+    // Running locally (XAMPP)
+    $dsn = "mysql:host=localhost;dbname=academic_system";
     $db_user = 'root';
     $db_pass = '';
 }
 
 try {
-    $pdo = new PDO("mysql:host=$db_host;dbname=$db_name", $db_user, $db_pass);
+    $pdo = new PDO($dsn, $db_user, $db_pass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 } catch(PDOException $e) {
