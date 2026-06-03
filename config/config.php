@@ -5,7 +5,7 @@ $railway_db_url = getenv('DATABASE_URL');
 if ($railway_db_url) {
     // Running on Railway
     $parsed = parse_url($railway_db_url);
-    $db_host = $parsed['mysql.railway.internal'];
+    $db_host = $parsed['host'];
     $db_port = $parsed['3306'] ?? 3306;
     $db_user = $parsed['root'];
     $db_pass = $parsed['FLExurmFuEiXUJmMiCFwStcBurNCHFXb'] ?? '';
