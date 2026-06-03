@@ -1,6 +1,7 @@
 <?php
 require_once 'includes/header.php';
 require_once 'config/config.php';
+// Production Sync tracking version 1.0.1
 
 if ($_SESSION['role'] != 'admin') {
     header('Location: dashboard.php');
