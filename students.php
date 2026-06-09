@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $term_suffix = "1"; 
             $prefix = $current_year . $term_suffix . "-";
             
-            // Fixed: changed student_id to school_id_number
+         
             $stmt = $pdo->prepare("SELECT school_id_number FROM students WHERE school_id_number LIKE ? ORDER BY school_id_number DESC LIMIT 1");
             $stmt->execute([$prefix . '%']);
             $last_student = $stmt->fetch();
@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $generated_id = $prefix . str_pad($next_sequence, 5, '0', STR_PAD_LEFT);
             $full_name = trim($_POST['last_name']) . ', ' . trim($_POST['first_name']);
             
-            // Fixed: changed student_id to school_id_number
+           
             $stmt = $pdo->prepare("INSERT INTO students (school_id_number, lrn, name, first_name, last_name, birth_date, gender, grade_level, section) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([
                 $generated_id, 
@@ -62,10 +62,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         } else {
             $full_name = trim($_POST['last_name']) . ', ' . trim($_POST['first_name']);
             
-            // Fixed: changed student_id column to school_id_number
+        
             $stmt = $pdo->prepare("UPDATE students SET school_id_number = ?, lrn = ?, name = ?, first_name = ?, last_name = ?, birth_date = ?, gender = ?, grade_level = ?, section = ? WHERE id = ?");
             $stmt->execute([
-                $_POST['student_id'], // We keep the form name 'student_id' but map it to 'school_id_number'
+                $_POST['student_id'], 
                 $lrn,
                 $full_name, 
                 $_POST['first_name'], 
@@ -152,8 +152,6 @@ if (!empty($search)) {
                 <option value="8">Grade 8</option>
                 <option value="9">Grade 9</option>
                 <option value="10">Grade 10</option>
-                <option value="11">Grade 11</option>
-                <option value="12">Grade 12</option>
             </select>
         </div>
         
@@ -265,8 +263,6 @@ if (!empty($search)) {
                     <option value="8">Grade 8</option>
                     <option value="9">Grade 9</option>
                     <option value="10">Grade 10</option>
-                    <option value="11">Grade 11</option>
-                    <option value="12">Grade 12</option>
                 </select>
             </div>
             
