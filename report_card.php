@@ -82,7 +82,7 @@ if ($student_id > 0) {
         foreach ($subjects as $subject) {
             $quarter_grades = [];
             
-            for ($q = 1; $q <= 4; $q++) {
+            for ($q = 1; $q <= 3; $q++) {
                 $stmt = $pdo->prepare("
                     SELECT a.*, s.score 
                     FROM assignments a

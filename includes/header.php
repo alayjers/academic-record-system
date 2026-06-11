@@ -24,12 +24,16 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <div class="logo">Academic Record System</div>
         <div class="nav">
             <a href="dashboard.php" class="<?php echo $current_page == 'dashboard.php' ? 'active' : ''; ?>">Dashboard</a>
+            
             <?php if ($_SESSION['role'] == 'admin'): ?>
+                <a href="sections.php" class="<?php echo $current_page == 'sections.php' ? 'active' : ''; ?>">Sections</a>
                 <a href="students.php" class="<?php echo $current_page == 'students.php' ? 'active' : ''; ?>">Students</a>
                 <a href="assign_teachers.php" class="<?php echo $current_page == 'assign_teachers.php' ? 'active' : ''; ?>">Assign Teachers</a>
             <?php endif; ?>
+            
             <a href="grades.php" class="<?php echo $current_page == 'grades.php' ? 'active' : ''; ?>">Grade Entry</a>
             <a href="report_card.php" class="<?php echo $current_page == 'report_card.php' ? 'active' : ''; ?>">Report Card</a>
+            
             <button class="theme-toggle-btn" id="themeToggle" style="margin-left: 8px;">
                 <span id="themeText">Light Mode</span>
             </button>

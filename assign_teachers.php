@@ -1,8 +1,8 @@
 <?php
 require_once 'includes/header.php';
 require_once 'config/config.php';
-// Production Sync tracking version 1.0.1
 
+// Strict Admin Security Check
 if ($_SESSION['role'] != 'admin') {
     header('Location: dashboard.php');
     exit();
@@ -12,9 +12,10 @@ $message = '';
 $message_type = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // Handling New Teacher Profile Creation
     if (isset($_POST['action_type']) && $_POST['action_type'] == 'create_teacher') {
-        $full_name = $_POST['full_name'];
-        $username = $_POST['username'];
+        $full_name = trim($_POST['full_name']);
+        $username = trim($_POST['username']);
         $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
         $role = $_POST['role'];
 
@@ -29,43 +30,46 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $message = "Teacher account for " . htmlspecialchars($full_name) . " created successfully!";
             $message_type = "success";
         }
-    } else {
-        $teacher_id = $_POST['teacher_id'];
-        $section = $_POST['section'];
-        $subject_id = isset($_POST['subject_id']) ? $_POST['subject_id'] : '';
+    } 
+    // Handling Section Assignments (Using the new section_id)
+    else if (isset($_POST['action_type']) && $_POST['action_type'] == 'assign_sections') {
+        $teacher_id = intval($_POST['teacher_id']);
+        $section_id = intval($_POST['section_id']);
+        $subject_id = isset($_POST['subject_id']) ? intval($_POST['subject_id']) : null;
         $assignment_type = $_POST['assignment_type'];
         
         if ($assignment_type == 'subject') {
-            $check = $pdo->prepare("SELECT id FROM teacher_subject_section WHERE teacher_id = ? AND section = ? AND subject_id = ?");
-            $check->execute([$teacher_id, $section, $subject_id]);
+            $check = $pdo->prepare("SELECT id FROM teacher_subject_section WHERE teacher_id = ? AND section_id = ? AND subject_id = ?");
+            $check->execute([$teacher_id, $section_id, $subject_id]);
             if ($check->fetch()) {
                 $message = "Teacher already assigned to this section for this subject.";
                 $message_type = "error";
             } else {
-                $stmt = $pdo->prepare("INSERT INTO teacher_subject_section (teacher_id, section, subject_id) VALUES (?, ?, ?)");
-                $stmt->execute([$teacher_id, $section, $subject_id]);
-                $message = "Teacher assigned successfully!";
+                $stmt = $pdo->prepare("INSERT INTO teacher_subject_section (teacher_id, section_id, subject_id) VALUES (?, ?, ?)");
+                $stmt->execute([$teacher_id, $section_id, $subject_id]);
+                $message = "Subject teacher assigned successfully!";
                 $message_type = "success";
             }
         } elseif ($assignment_type == 'advisory') {
-            $check = $pdo->prepare("SELECT id FROM advisory_section WHERE teacher_id = ? AND section = ?");
-            $check->execute([$teacher_id, $section]);
+            $check = $pdo->prepare("SELECT id FROM advisory_section WHERE teacher_id = ? AND section_id = ?");
+            $check->execute([$teacher_id, $section_id]);
             if ($check->fetch()) {
-                $message = "Teacher already assigned as advisory for $section.";
+                $message = "Teacher already assigned as advisory for this section.";
                 $message_type = "error";
             } else {
-                $stmt = $pdo->prepare("INSERT INTO advisory_section (teacher_id, section) VALUES (?, ?)");
-                $stmt->execute([$teacher_id, $section]);
-                $message = "Teacher assigned as advisory for $section successfully!";
+                $stmt = $pdo->prepare("INSERT INTO advisory_section (teacher_id, section_id) VALUES (?, ?)");
+                $stmt->execute([$teacher_id, $section_id]);
+                $message = "Advisory teacher assigned successfully!";
                 $message_type = "success";
             }
         }
     }
 }
 
+// Handling Removals
 if (isset($_GET['delete_subject_group'])) {
-    $teacher_id = $_GET['teacher_id'];
-    $subject_id = $_GET['subject_id'];
+    $teacher_id = intval($_GET['teacher_id']);
+    $subject_id = intval($_GET['subject_id']);
     $stmt = $pdo->prepare("DELETE FROM teacher_subject_section WHERE teacher_id = ? AND subject_id = ?");
     $stmt->execute([$teacher_id, $subject_id]);
     header('Location: assign_teachers.php');
@@ -73,35 +77,40 @@ if (isset($_GET['delete_subject_group'])) {
 }
 
 if (isset($_GET['delete_advisory_group'])) {
-    $teacher_id = $_GET['teacher_id'];
+    $teacher_id = intval($_GET['teacher_id']);
     $stmt = $pdo->prepare("DELETE FROM advisory_section WHERE teacher_id = ?");
     $stmt->execute([$teacher_id]);
     header('Location: assign_teachers.php');
     exit();
 }
 
+// Data Fetching for Dropdowns
 $teachers = $pdo->query("SELECT id, username, full_name, role FROM users WHERE role != 'admin' ORDER BY full_name")->fetchAll();
-
-$sections = $pdo->query("SELECT DISTINCT section FROM students WHERE section IS NOT NULL AND section != '' ORDER BY section")->fetchAll();
-
 $all_subjects = $pdo->query("SELECT id, name as subject_name FROM subjects ORDER BY name ASC")->fetchAll();
 
+// NEW: Fetch from structural sections table instead of raw student text strings
+$sections = $pdo->query("SELECT id, name, grade_level, school_year FROM sections ORDER BY school_year DESC, grade_level ASC, name ASC")->fetchAll();
+
+// NEW: Join the sections table to generate dynamic, readable names for Subject Assignments
 $stmt = $pdo->query("
     SELECT tss.teacher_id, tss.subject_id, u.full_name as teacher_name, s.name as subject_name,
-           GROUP_CONCAT(tss.section ORDER BY tss.section SEPARATOR ', ') as combined_sections
+           GROUP_CONCAT(CONCAT('Grade ', sec.grade_level, ' - ', sec.name) ORDER BY sec.grade_level, sec.name SEPARATOR ', ') as combined_sections
     FROM teacher_subject_section tss 
     JOIN users u ON tss.teacher_id = u.id 
     JOIN subjects s ON tss.subject_id = s.id
+    JOIN sections sec ON tss.section_id = sec.id
     GROUP BY tss.teacher_id, tss.subject_id, u.full_name, s.name
     ORDER BY u.full_name ASC, s.name ASC
 ");
 $subject_assignments = $stmt->fetchAll();
 
+// NEW: Join the sections table to generate dynamic, readable names for Advisory Assignments
 $stmt = $pdo->query("
     SELECT asec.teacher_id, u.full_name as teacher_name,
-           GROUP_CONCAT(asec.section ORDER BY asec.section SEPARATOR ', ') as combined_sections
+           GROUP_CONCAT(CONCAT('Grade ', sec.grade_level, ' - ', sec.name) ORDER BY sec.grade_level, sec.name SEPARATOR ', ') as combined_sections
     FROM advisory_section asec 
     JOIN users u ON asec.teacher_id = u.id 
+    JOIN sections sec ON asec.section_id = sec.id
     GROUP BY asec.teacher_id, u.full_name
     ORDER BY u.full_name ASC
 ");
@@ -133,8 +142,6 @@ $advisory_assignments = $stmt->fetchAll();
     .btn-primary:hover { background-color: #0096b4; border-color: #0096b4; }
     .btn-secondary { background-color: transparent; color: var(--text-title, #111111); border: 1px solid var(--border-card, #d1d5db); padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s ease; }
     .btn-secondary:hover { background-color: var(--mode-btn-bg, rgba(0, 0, 0, 0.04)); border-color: var(--mode-btn-border, #00b4d8); color: var(--mode-btn-text, #00b4d8); }
-    [data-theme="dark"] .btn-secondary, body.dark-mode .btn-secondary { color: #ffffff; border-color: #3a3a3a; }
-    [data-theme="dark"] .btn-secondary:hover, body.dark-mode .btn-secondary:hover { background-color: rgba(255, 255, 255, 0.05); border-color: #00b4d8; color: #00b4d8; }
 </style>
 
 <div class="header-action-area">
@@ -197,11 +204,13 @@ $advisory_assignments = $stmt->fetchAll();
                 </select>
             </div>
             <div class="form-group">
-                <label>Select Section</label>
-                <select name="section" required>
+                <label>Select Master Section</label>
+                <select name="section_id" required>
                     <option value="">Select Section</option>
                     <?php foreach ($sections as $s): ?>
-                        <option value="<?php echo htmlspecialchars($s['section']); ?>"><?php echo htmlspecialchars($s['section']); ?></option>
+                        <option value="<?php echo $s['id']; ?>">
+                            Grade <?php echo $s['grade_level']; ?> - <?php echo htmlspecialchars($s['name']); ?> (<?php echo htmlspecialchars($s['school_year']); ?>)
+                        </option>
                     <?php endforeach; ?>
                 </select>
             </div>
