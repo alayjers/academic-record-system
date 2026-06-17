@@ -6,30 +6,30 @@
 }
 
 :root {
-    --bg-base: #f4f7f6;
-    --surface-card: rgba(255, 255, 255, 0.85);
-    --border-card: rgba(45, 106, 79, 0.08);
-    --shadow-card: 0 24px 48px rgba(31, 49, 39, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    --bg-base: #e8f5e9;
+    --surface-card: rgba(255, 255, 255, 0.65); 
+    --border-card: rgba(45, 106, 79, 0.1);
+    --shadow-card: 0 32px 64px rgba(27, 67, 50, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.6);
     --text-title: #1b4332;
-    --text-subtitle: #52b788;
-    --text-muted: #64748b;
-    --input-bg: #ffffff;
-    --input-border: #d8e2dc;
-    --input-text: #1e293b;
-    --input-placeholder: #94a3b8;
+    --text-subtitle: #2d6a4f;
+    --text-muted: #475569; 
+    --input-bg: rgba(255, 255, 255, 0.75);
+    --input-border: rgba(45, 106, 79, 0.15);
+    --input-text: #1b4332;
+    --input-placeholder: #74c69d;
     --primary-start: #2d6a4f;
     --primary-end: #40916c;
     --primary-shadow: rgba(45, 106, 79, 0.15);
     --primary-hover-start: #1b4332;
     --primary-hover-end: #2d6a4f;
     --primary-hover-shadow: rgba(45, 106, 79, 0.25);
-    --ambient-1: radial-gradient(circle, rgba(82, 183, 136, 0.10) 0%, rgba(0,0,0,0) 70%);
-    --ambient-2: radial-gradient(circle, rgba(116, 198, 157, 0.08) 0%, rgba(0,0,0,0) 70%);
-    --banner-bg: rgba(239, 68, 68, 0.06);
+    --ambient-1: radial-gradient(circle, #52b788 0%, rgba(232, 245, 233, 0) 70%);
+    --ambient-2: radial-gradient(circle, #74c69d 0%, rgba(232, 245, 233, 0) 70%);
+    --banner-bg: rgba(239, 68, 68, 0.08);
     --banner-text: #dc2626;
     --banner-border: rgba(239, 68, 68, 0.15);
-    --mode-btn-bg: rgba(45, 106, 79, 0.06);
-    --mode-btn-border: rgba(45, 106, 79, 0.1);
+    --mode-btn-bg: rgba(45, 106, 79, 0.08);
+    --mode-btn-border: rgba(45, 106, 79, 0.12);
     --mode-btn-text: #2d6a4f;
     --table-header-bg: #e9f0ed;
     --table-row-hover: rgba(45, 106, 79, 0.02);
@@ -76,24 +76,36 @@ body {
 
 .ambient-glow-1 {
     position: fixed;
-    width: 600px;
-    height: 600px;
+    width: 800px;
+    height: 800px;
     background: var(--ambient-1);
-    top: -10%;
-    left: -5%;
+    top: -25%;
+    left: -15%;
     z-index: 0;
     pointer-events: none;
+    opacity: 0.6;
+    transition: background 0.4s, opacity 0.4s;
+}
+
+[data-theme="dark"] .ambient-glow-1 {
+    opacity: 1;
 }
 
 .ambient-glow-2 {
     position: fixed;
-    width: 700px;
-    height: 700px;
+    width: 900px;
+    height: 900px;
     background: var(--ambient-2);
-    bottom: 5%;
-    right: -5%;
+    bottom: -30%;
+    right: -15%;
     z-index: 0;
     pointer-events: none;
+    opacity: 0.6;
+    transition: background 0.4s, opacity 0.4s;
+}
+
+[data-theme="dark"] .ambient-glow-2 {
+    opacity: 1;
 }
 
 .header {
@@ -197,7 +209,6 @@ h1 {
     margin-bottom: 32px;
 }
 
-/* Reusable Dynamic Table Grid Styles */
 .table-container {
     width: 100%;
     overflow-x: auto;
@@ -235,8 +246,7 @@ h1 {
     background: var(--table-row-hover);
 }
 
-/* Forms & Input Custom Framework */
-input[type="text"], input[type=\"password\"], input[type=\"number\"], select {
+input[type="text"], input[type="password"], input[type="number"], select {
     background: var(--input-bg);
     border: 1px solid var(--input-border);
     border-radius: 10px;
@@ -252,7 +262,6 @@ input:focus, select:focus {
     box-shadow: 0 0 0 3px var(--primary-shadow);
 }
 
-/* Button UI kit matching Login Page layout tokens */
 button[type="submit"], .primary-btn {
     background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%);
     color: #ffffff;
@@ -324,7 +333,6 @@ button[type="submit"]:hover, .primary-btn:hover {
     padding-left: 6px;
 }
 
-/* Modal Windows Setup */
 .modal {
     display: none;
     position: fixed;
@@ -362,4 +370,3 @@ button[type="submit"]:hover, .primary-btn:hover {
     cursor: pointer;
     color: var(--text-muted);
 }
-

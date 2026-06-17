@@ -10,6 +10,31 @@ if (isset($_SESSION['user_id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
+
+    <style>
+        html, body {
+            background: #e8f5e9; 
+        }
+        html[data-theme="dark"], html[data-theme="dark"] body {
+            background: #0f1412 !important; 
+        }
+    </style>
+
+    <title>Academic Record System</title>
+    <link rel="stylesheet" href="style.css">
+    </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Academic Record System</title>
     <style>
         * {
@@ -20,42 +45,43 @@ if (isset($_SESSION['user_id'])) {
         }
 
         :root {
-            --bg-base: #f4f7f6;
-            --surface-card: rgba(255, 255, 255, 0.85);
-            --border-card: rgba(45, 106, 79, 0.08);
-            --shadow-card: 0 24px 48px rgba(31, 49, 39, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            --bg-base: #e8f5e9;
+            --surface-card: rgba(255, 255, 255, 0.4);
+            --border-card: rgba(45, 106, 79, 0.1);
+            --shadow-card: 0 32px 64px rgba(27, 67, 50, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.6);
             --text-title: #1b4332;
-            --text-subtitle: #52b788;
-            --text-muted: #64748b;
-            --input-bg: rgba(255, 255, 255, 0.9);
-            --input-border: #d8e2dc;
-            --input-text: #1e293b;
-            --input-placeholder: #94a3b8;
+            --text-subtitle: #2d6a4f;
+            --text-muted: #52b788;
+            --input-bg: rgba(255, 255, 255, 0.65);
+            --input-border: rgba(45, 106, 79, 0.15);
+            --input-text: #1b4332;
+            --input-placeholder: #74c69d;
             --primary-start: #2d6a4f;
             --primary-end: #40916c;
             --primary-shadow: rgba(45, 106, 79, 0.15);
             --primary-hover-start: #1b4332;
             --primary-hover-end: #2d6a4f;
             --primary-hover-shadow: rgba(45, 106, 79, 0.25);
-            --ambient-1: radial-gradient(circle, rgba(82, 183, 136, 0.15) 0%, rgba(0,0,0,0) 70%);
-            --ambient-2: radial-gradient(circle, rgba(116, 198, 157, 0.12) 0%, rgba(0,0,0,0) 70%);
-            --banner-bg: rgba(239, 68, 68, 0.06);
+            --ambient-1: radial-gradient(circle, #52b788 0%, rgba(232, 245, 233, 0) 70%);
+            --ambient-2: radial-gradient(circle, #74c69d 0%, rgba(232, 245, 233, 0) 70%);
+            --banner-bg: rgba(239, 68, 68, 0.08);
             --banner-text: #dc2626;
             --banner-border: rgba(239, 68, 68, 0.15);
-            --mode-btn-bg: rgba(45, 106, 79, 0.06);
-            --mode-btn-border: rgba(45, 106, 79, 0.1);
+            --mode-btn-bg: rgba(45, 106, 79, 0.08);
+            --mode-btn-border: rgba(45, 106, 79, 0.12);
             --mode-btn-text: #2d6a4f;
+            --logo-border: rgba(45, 106, 79, 0.15);
         }
 
         [data-theme="dark"] {
             --bg-base: #0f1412;
-            --surface-card: rgba(24, 34, 30, 0.7);
-            --border-card: rgba(255, 255, 255, 0.04);
+            --surface-card: rgba(24, 34, 30, 0.45);
+            --border-card: rgba(255, 255, 255, 0.06);
             --shadow-card: 0 32px 64px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.05);
             --text-title: #ffffff;
             --text-subtitle: #74c69d;
             --text-muted: #94a3b8;
-            --input-bg: rgba(255, 255, 255, 0.02);
+            --input-bg: rgba(15, 23, 42, 0.4);
             --input-border: rgba(255, 255, 255, 0.08);
             --input-text: #ffffff;
             --input-placeholder: rgba(255, 255, 255, 0.25);
@@ -65,14 +91,15 @@ if (isset($_SESSION['user_id'])) {
             --primary-hover-start: #52b788;
             --primary-hover-end: #74c69d;
             --primary-hover-shadow: rgba(82, 183, 136, 0.3);
-            --ambient-1: radial-gradient(circle, rgba(45, 106, 79, 0.25) 0%, rgba(0,0,0,0) 70%);
-            --ambient-2: radial-gradient(circle, rgba(82, 183, 136, 0.15) 0%, rgba(0,0,0,0) 70%);
+            --ambient-1: radial-gradient(circle, rgba(45, 106, 79, 0.35) 0%, rgba(15, 20, 18, 0) 70%);
+            --ambient-2: radial-gradient(circle, rgba(82, 183, 136, 0.25) 0%, rgba(15, 20, 18, 0) 70%);
             --banner-bg: rgba(239, 68, 68, 0.1);
             --banner-text: #f87171;
             --banner-border: rgba(239, 68, 68, 0.2);
             --mode-btn-bg: rgba(255, 255, 255, 0.04);
             --mode-btn-border: rgba(255, 255, 255, 0.08);
             --mode-btn-text: #74c69d;
+            --logo-border: rgba(255, 255, 255, 0.15);
         }
 
         body {
@@ -89,22 +116,34 @@ if (isset($_SESSION['user_id'])) {
 
         .ambient-glow-1 {
             position: absolute;
-            width: 600px;
-            height: 600px;
+            width: 800px;
+            height: 800px;
             background: var(--ambient-1);
-            top: -15%;
-            left: -10%;
+            top: -25%;
+            left: -15%;
             z-index: 1;
+            opacity: 0.6;
+            transition: background 0.4s, opacity 0.4s;
+        }
+
+        [data-theme="dark"] .ambient-glow-1 {
+            opacity: 1;
         }
 
         .ambient-glow-2 {
             position: absolute;
-            width: 700px;
-            height: 700px;
+            width: 900px;
+            height: 900px;
             background: var(--ambient-2);
-            bottom: -25%;
-            right: -10%;
+            bottom: -30%;
+            right: -15%;
             z-index: 1;
+            opacity: 0.6;
+            transition: background 0.4s, opacity 0.4s;
+        }
+
+        [data-theme="dark"] .ambient-glow-2 {
+            opacity: 1;
         }
 
         .theme-switcher {
@@ -143,30 +182,52 @@ if (isset($_SESSION['user_id'])) {
 
         .login-card {
             background: var(--surface-card);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(30px) saturate(170%);
+            -webkit-backdrop-filter: blur(30px) saturate(170%);
             border-radius: 24px;
-            padding: 48px 40px;
+            padding: 44px 40px;
             box-shadow: var(--shadow-card);
             border: 1px solid var(--border-card);
             text-align: center;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        .logo-container {
+            width: 88px;
+            height: 88px;
+            margin: 0 auto 20px auto;
+            border-radius: 50%;
+            border: 2px solid var(--logo-border);
+            padding: 2px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: transparent;
+        }
+
+        .logo-container img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
         .login-card h2 {
             color: var(--text-title);
-            font-size: 26px;
-            font-weight: 600;
+            font-size: 24px;
+            font-weight: 700;
             letter-spacing: -0.5px;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
             transition: color 0.4s;
         }
 
         .login-card p.subtitle {
             color: var(--text-subtitle);
-            font-size: 14px;
-            margin-bottom: 38px;
-            font-weight: 500;
+            font-size: 13px;
+            margin-bottom: 36px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             transition: color 0.4s;
         }
 
@@ -176,10 +237,19 @@ if (isset($_SESSION['user_id'])) {
             text-align: left;
         }
 
+        .input-group label {
+            display: block;
+            color: var(--text-title);
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            padding-left: 2px;
+        }
+
         .input-group input {
             width: 100%;
-            padding: 16px 18px;
-            font-size: 15px;
+            padding: 15px 16px;
+            font-size: 14.5px;
             background: var(--input-bg);
             border: 1px solid var(--input-border);
             border-radius: 12px;
@@ -193,13 +263,13 @@ if (isset($_SESSION['user_id'])) {
         }
 
         .input-group input:focus {
-            border-color: #40916c;
-            box-shadow: 0 0 0 4px rgba(64, 145, 108, 0.15);
+            border-color: var(--text-subtitle);
+            box-shadow: 0 0 0 4px rgba(82, 183, 136, 0.15);
         }
 
         .btn-login {
             width: 100%;
-            padding: 16px;
+            padding: 15px;
             background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%);
             color: #ffffff;
             border: none;
@@ -207,7 +277,7 @@ if (isset($_SESSION['user_id'])) {
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 12px;
+            margin-top: 10px;
             transition: all 0.3s ease;
             box-shadow: 0 4px 12px var(--primary-shadow);
         }
@@ -240,6 +310,13 @@ if (isset($_SESSION['user_id'])) {
             background: rgba(239, 68, 68, 0.04) !important;
             box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15) !important;
         }
+
+        .footer-note {
+            margin-top: 32px;
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
     </style>
 </head>
 <body>
@@ -255,8 +332,12 @@ if (isset($_SESSION['user_id'])) {
 
     <div class="login-wrapper">
         <form class="login-card" id="loginForm" method="POST" action="authenticate.php" novalidate>
-            <h2>Welcome back</h2>
-            <p class="subtitle">Academic Record System</p>
+            <div class="logo-container">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ-_Nssj-vBA66Npb16JJfkH129sz0OyrrrhQ&s" alt="Timoteo Paez Integrated School Seal">
+            </div>
+
+            <h2>T-PAEZ Record System</h2>
+            <p class="subtitle">Timoteo Paez Integrated School</p>
             
             <?php if (isset($_GET['error']) && $_GET['error'] == 1): ?>
                 <div class="error-banner">
@@ -265,14 +346,21 @@ if (isset($_SESSION['user_id'])) {
             <?php endif; ?>
             
             <div class="input-group">
-                <input type="text" id="username" name="username" placeholder="Username" required autocomplete="off">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Enter your username" required autocomplete="off">
             </div>
             
             <div class="input-group">
-                <input type="password" id="password" name="password" placeholder="Password" required>
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="••••••••" required>
             </div>
             
             <button type="submit" class="btn-login">Sign In</button>
+
+            <div class="footer-note">
+                Official Portal &bull; K-to-12 Grading Matrix Framework<br>
+                Secured Academic Database Infrastructure
+            </div>
         </form>
     </div>
 
@@ -282,7 +370,6 @@ if (isset($_SESSION['user_id'])) {
             const usernameInput = document.getElementById('username');
             const passwordInput = document.getElementById('password');
             const themeToggle = document.getElementById('themeToggle');
-            const themeIcon = document.getElementById('themeIcon');
             const themeText = document.getElementById('themeText');
 
             const currentTheme = localStorage.getItem('theme') || 'light';
@@ -308,6 +395,7 @@ if (isset($_SESSION['user_id'])) {
                 let isValid = true;
 
                 if (usernameInput.value.trim() === '') {
+                    usernameInput.value = '';
                     usernameInput.classList.add('input-error');
                     isValid = false;
                 } else {
@@ -315,6 +403,7 @@ if (isset($_SESSION['user_id'])) {
                 }
 
                 if (passwordInput.value.trim() === '') {
+                    passwordInput.value = '';
                     passwordInput.classList.add('input-error');
                     isValid = false;
                 } else {

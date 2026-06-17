@@ -140,11 +140,6 @@ if ($student_id > 0) {
 ?>
 
 <style>
-    /* ==========================================================
-       DYNAMIC THEMING CONFIGURATION (ADAPTS TO GLOBAL LAYOUT)
-       ========================================================== */
-    /* Forced body selectors removed so header.php controls framework background toggles */
-
     .search-container { 
         background: rgba(128, 128, 128, 0.06); 
         padding: 22px; 
@@ -236,9 +231,6 @@ if ($student_id > 0) {
     .btn-secondary { background: rgba(128, 128, 128, 0.12); border: 1px solid rgba(128, 128, 128, 0.2); color: inherit; }
     .btn-secondary:hover { background: rgba(128, 128, 128, 0.22); }
     
-    /* ==========================================================
-       FORCE PRINT CONTAINER SHEET CONTENT TO STAY SOLID BLACK/WHITE
-       ========================================================== */
     .print-container { 
         background: #ffffff !important; 
         color: #000000 !important; 
@@ -248,11 +240,6 @@ if ($student_id > 0) {
         max-width: 1140px; 
         margin: 0 auto; 
     }
-    .deped-header { text-align: center; margin-bottom: 15px; position: relative; border-bottom: 2px solid #000000; padding-bottom: 10px; }
-    .deped-header img { height: 55px; position: absolute; left: 15px; top: 0; }
-    .deped-header h2 { font-size: 13px; font-weight: 800; margin: 0; letter-spacing: 0.5px; line-height: 1.3; }
-    .deped-header p { font-size: 11px; margin: 2px 0 0 0; line-height: 1.3; }
-    .deped-header .school-title { font-size: 14px; font-weight: 800; margin-top: 2px; }
     
     .report-card-body { display: flex; gap: 30px; align-items: flex-start; margin-top: 15px; }
     .report-column { flex: 1; min-width: 0; }
@@ -279,7 +266,6 @@ if ($student_id > 0) {
     .sf10-block { border: 1px solid #000000; padding: 12px; border-radius: 4px; }
     .sf10-header-info { display: flex; flex-wrap: wrap; gap: 15px; font-size: 11px; margin-bottom: 10px; padding: 6px; border: 1px solid #000; }
 
-    /* Structural protection to ensure card layout renders cleanly regardless of theme rules */
     .print-container, 
     .print-container * {
         color: #000000 !important;         
@@ -358,13 +344,21 @@ if ($student_id > 0) {
         </div>
 
         <div class="print-container">
-            <div class="deped-header">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Department_of_Education_of_the_Philippines_Seal.svg/1200px-Department_of_Education_of_the_Philippines_Seal.svg.png" alt="DepEd Seal">
-                <h2>REPUBLIC OF THE PHILIPPINES<br>DEPARTMENT OF EDUCATION</h2>
-                <p>NATIONAL CAPITAL REGION &bull; DIVISION OF MANILA</p>
-                <p class="school-title">TIMOTEO PAEZ INTEGRATED HIGH SCHOOL</p>
-                <p style="font-size: 9px; color: #555555; font-style: italic;">139 Nepa St, Tondo, Manila, 1013 Metro Manila</p>
-                <div style="margin-top: 10px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">School Form 9 (SF9) &bull; Learner's Progress Report Card &bull; SY <?php echo htmlspecialchars($school_year); ?></div>
+            <div class="deped-header" style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #000000; padding-bottom: 10px; margin-bottom: 15px; position: relative;">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ-_Nssj-vBA66Npb16JJfkH129sz0OyrrrhQ&s" alt="DepEd Seal" style="height: 55px; width: auto; object-fit: contain;">
+                
+                <div style="text-align: center; flex: 1; padding: 0 15px;">
+                    <h2 style="font-size: 13px; font-weight: 800; margin: 0; letter-spacing: 0.5px; line-height: 1.3;">REPUBLIC OF THE PHILIPPINES<br>DEPARTMENT OF EDUCATION</h2>
+                    <p style="font-size: 11px; margin: 2px 0 0 0; line-height: 1.3;">NATIONAL CAPITAL REGION &bull; DIVISION OF MANILA</p>
+                    <p class="school-title" style="font-size: 14px; font-weight: 800; margin-top: 2px; margin-bottom: 0;">TIMOTEO PAEZ INTEGRATED HIGH SCHOOL</p>
+                    <p style="font-size: 9px; color: #555555; font-style: italic; margin: 2px 0 0 0;">139 Nepa St, Tondo, Manila, 1013 Metro Manila</p>
+                </div>
+
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Seal_of_the_Department_of_Education_of_the_Philippines.png/1280px-Seal_of_the_Department_of_Education_of_the_Philippines.png" alt="Division Seal" style="height: 55px; width: auto; object-fit: contain;">
+            </div>
+            
+            <div style="text-align: center; margin-top: -5px; margin-bottom: 15px;">
+                <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #000000 !important;">School Form 9 (SF9) &bull; Learner's Progress Report Card &bull; SY <?php echo htmlspecialchars($school_year); ?></div>
             </div>
 
             <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 10px; border-bottom: 1px solid #000; padding-bottom: 6px;">
@@ -536,13 +530,21 @@ if ($student_id > 0) {
         </div>
 
         <div class="print-container">
-            <div class="deped-header">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Department_of_Education_of_the_Philippines_Seal.svg/1200px-Department_of_Education_of_the_Philippines_Seal.svg.png" alt="DepEd Seal">
-                <h2>REPUBLIC OF THE PHILIPPINES<br>DEPARTMENT OF EDUCATION</h2>
-                <p>NATIONAL CAPITAL REGION &bull; DIVISION OF MANILA</p>
-                <p class="school-title">TIMOTEO PAEZ INTEGRATED HIGH SCHOOL</p>
-                <div style="margin-top: 8px; font-size: 13px; font-weight: 800; text-transform: uppercase;">School Form 10 (SF10) &bull; Learner's Permanent Record</div>
-                <p style="font-size: 9px; margin-top: 2px; font-style: italic; color: #444;">(Formerly Form 137 - Scholastic History Profile)</p>
+            <div class="deped-header" style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #000000; padding-bottom: 10px; margin-bottom: 15px; position: relative;">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ-_Nssj-vBA66Npb16JJfkH129sz0OyrrrhQ&s" alt="TPAEZ Logo" style="height: 55px; width: auto; object-fit: contain;">
+                
+                <div style="text-align: center; flex: 1; padding: 0 15px;">
+                    <h2 style="font-size: 13px; font-weight: 800; margin: 0; letter-spacing: 0.5px; line-height: 1.3;">REPUBLIC OF THE PHILIPPINES<br>DEPARTMENT OF EDUCATION</h2>
+                    <p style="font-size: 11px; margin: 2px 0 0 0; line-height: 1.3;">NATIONAL CAPITAL REGION &bull; DIVISION OF MANILA</p>
+                    <p class="school-title" style="font-size: 14px; font-weight: 800; margin-top: 2px; margin-bottom: 0;">TIMOTEO PAEZ INTEGRATED HIGH SCHOOL</p>
+                </div>
+
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Seal_of_the_Department_of_Education_of_the_Philippines.png/1280px-Seal_of_the_Department_of_Education_of_the_Philippines.png" alt="Division Seal" style="height: 55px; width: auto; object-fit: contain;">
+            </div>
+
+            <div style="text-align: center; margin-top: -5px; margin-bottom: 15px;">
+                <div style="font-size: 13px; font-weight: 800; text-transform: uppercase;">School Form 10 (SF10) &bull; Learner's Permanent Record</div>
+                <p style="font-size: 9px; margin: 2px 0 0 0; font-style: italic; color: #444;">(Formerly Form 137 - Scholastic History Profile)</p>
             </div>
 
             <div class="header-text" style="text-align: left; padding-left: 4px; font-size: 11px;">I. Learner Profile Information</div>
