@@ -51,10 +51,9 @@ $search_results = [];
 if (!empty($search)) {
     $like = "%$search%";
     $stmt = $pdo->prepare("
-        SELECT id, name, first_name, last_name, lrn, school_id_number, grade_level, section 
+        SELECT id, first_name, last_name, lrn, school_id_number, grade_level, section 
         FROM students 
-        WHERE name LIKE ? 
-           OR first_name LIKE ? 
+        WHERE first_name LIKE ? 
            OR last_name LIKE ? 
            OR lrn LIKE ? 
            OR school_id_number LIKE ?
@@ -62,7 +61,7 @@ if (!empty($search)) {
         LIMIT 20
     ");
     
-    $stmt->execute([$like, $like, $like, $like, $like]);
+    $stmt->execute([$like, $like, $like, $like]);
     $search_results = $stmt->fetchAll();
 }
 
@@ -300,10 +299,10 @@ if ($student_id > 0) {
     <div style="display: flex; flex-direction: column; gap: 8px;">
         <?php foreach ($search_results as $result): 
             $student_no = htmlspecialchars($result['school_id_number'] ?? '');
-            $last = !empty($result['last_name']) ? htmlspecialchars($result['last_name']) : htmlspecialchars($result['name'] ?? '');
-            $first = !empty($result['first_name']) ? htmlspecialchars($result['first_name']) : '';
+            $last = htmlspecialchars($result['last_name'] ?? '');
+            $first = htmlspecialchars($result['first_name'] ?? '');
             $section = !empty($result['section']) ? htmlspecialchars($result['section']) : 'No Section';
-            $full_name = $first ? "$last, $first" : $last;
+            $full_name = (!empty($last) && !empty($first)) ? "$last, $first" : (!empty($last) ? $last : ($result['name'] ?? ''));
         ?>
             <div class="result-item">
                 <a href="?student_id=<?php echo $result['id']; ?>&school_year=<?php echo urlencode($school_year); ?>&view=<?php echo $current_view; ?>">
@@ -321,7 +320,9 @@ if ($student_id > 0) {
 <?php endif; ?>
 
 <?php if ($student): 
-    $student_display_name = (!empty($student['last_name']) && !empty($student['first_name'])) ? $student['last_name'] . ', ' . $student['first_name'] : ($student['name'] ?? '');
+    $last_s = htmlspecialchars($student['last_name'] ?? '');
+    $first_s = htmlspecialchars($student['first_name'] ?? '');
+    $student_display_name = (!empty($last_s) && !empty($first_s)) ? "$last_s, $first_s" : (!empty($last_s) ? $last_s : ($student['name'] ?? ''));
 ?>
 <div class="view-switcher-bar no-print">
     <a href="?student_id=<?php echo $student_id; ?>&school_year=<?php echo urlencode($school_year); ?>&view=sf9" class="view-tab <?php echo $current_view === 'sf9' ? 'active' : ''; ?>"> SF9 (Report Card)</a>
@@ -362,7 +363,7 @@ if ($student_id > 0) {
             </div>
 
             <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 10px; border-bottom: 1px solid #000; padding-bottom: 6px;">
-                <div><strong>NAME:</strong> <?php echo htmlspecialchars($student_display_name); ?></div>
+                <div><strong>NAME:</strong> <?php echo $student_display_name; ?></div>
                 <div><strong>LRN:</strong> <?php echo htmlspecialchars($student['lrn'] ?? ''); ?></div>
                 <div><strong>GRADE & SECTION:</strong> Grade <?php echo htmlspecialchars($student['grade_level'] ?? ''); ?> - <?php echo htmlspecialchars($student['section'] ?? ''); ?></div>
             </div>
@@ -561,7 +562,7 @@ if ($student_id > 0) {
             
             <div class="sf10-grid">
                 <div class="sf10-block">
-                    <div style="font-weight: 800; font-size: 11px; border-bottom: 1px solid #000; padding-bottom: 4px; margin-bottom: 6px;">
+                    <div style="font-weight: 800; font-size: 11px; border-bottom: 1px solid #000000; padding-bottom: 4px; margin-bottom: 6px;">
                         GRADE LEVEL: <?php echo htmlspecialchars($student['grade_level'] ?? ''); ?> | SY: <?php echo htmlspecialchars($school_year); ?>
                     </div>
                     <div style="font-size: 10px; margin-bottom: 6px;"><strong>School:</strong> Timoteo Paez Integrated High School &nbsp;&nbsp; <strong>Section:</strong> <?php echo htmlspecialchars($student['section'] ?? ''); ?></div>
