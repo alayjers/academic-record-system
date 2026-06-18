@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Jun 11, 2026 at 07:07 PM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Host: localhost
+-- Generation Time: Jun 18, 2026 at 09:04 AM
+-- Server version: 10.4.28-MariaDB
+-- PHP Version: 8.2.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -411,10 +411,9 @@ CREATE TABLE `enrollments` (
 INSERT INTO `enrollments` (`id`, `student_id`, `section_id`, `status`, `enrolled_at`) VALUES
 (1, 16, 1, 'Enrolled', '2026-06-11 13:37:00'),
 (2, 17, 1, 'Enrolled', '2026-06-11 13:37:00'),
-(3, 18, 2, 'Enrolled', '2026-06-11 13:37:00'),
-(4, 19, 2, 'Enrolled', '2026-06-11 13:37:00'),
-(5, 20, 3, 'Enrolled', '2026-06-11 13:37:00'),
-(6, 21, 3, 'Enrolled', '2026-06-11 13:37:00');
+(12, 26, 1, 'Enrolled', '2026-06-18 01:31:01'),
+(14, 28, 2, 'Enrolled', '2026-06-18 01:31:58'),
+(15, 29, 2, 'Enrolled', '2026-06-18 01:32:22');
 
 -- --------------------------------------------------------
 
@@ -448,29 +447,6 @@ INSERT INTO `scores` (`id`, `student_id`, `assignment_id`, `score`, `semester`, 
 (21, 16, 87, 40.00, 1, '2025-2026'),
 (22, 16, 88, 40.00, 1, '2025-2026'),
 (23, 17, 78, 12.00, 1, '2025-2026'),
-(36, 20, 78, 30.00, 1, '2025-2026'),
-(37, 20, 79, 14.00, 1, '2025-2026'),
-(38, 20, 80, 14.00, 1, '2025-2026'),
-(39, 20, 81, 9.00, 1, '2025-2026'),
-(40, 20, 82, 14.00, 1, '2025-2026'),
-(41, 20, 83, 90.00, 1, '2025-2026'),
-(42, 20, 84, 90.00, 1, '2025-2026'),
-(43, 20, 85, 90.00, 1, '2025-2026'),
-(44, 20, 86, 40.00, 1, '2025-2026'),
-(45, 20, 87, 40.00, 1, '2025-2026'),
-(46, 20, 88, 40.00, 1, '2025-2026'),
-(84, 18, 78, 12.00, 1, '2025-2026'),
-(85, 18, 79, 15.00, 1, '2025-2026'),
-(86, 18, 80, 15.00, 1, '2025-2026'),
-(87, 18, 81, 10.00, 1, '2025-2026'),
-(88, 18, 82, 15.00, 1, '2025-2026'),
-(89, 18, 83, 90.00, 1, '2025-2026'),
-(90, 18, 84, 90.00, 1, '2025-2026'),
-(91, 18, 85, 90.00, 1, '2025-2026'),
-(92, 18, 86, 30.00, 1, '2025-2026'),
-(93, 18, 87, 30.00, 1, '2025-2026'),
-(94, 18, 88, 0.00, 1, '2025-2026'),
-(95, 19, 78, 12.50, 1, '2025-2026'),
 (156, 16, 137, 29.00, 1, '2025-2026'),
 (157, 16, 138, 14.00, 1, '2025-2026'),
 (158, 16, 139, 14.00, 1, '2025-2026'),
@@ -525,7 +501,19 @@ INSERT INTO `scores` (`id`, `student_id`, `assignment_id`, `score`, `semester`, 
 (207, 16, 188, 90.00, 2, '2025-2026'),
 (208, 16, 189, 40.00, 2, '2025-2026'),
 (209, 16, 190, 40.00, 2, '2025-2026'),
-(210, 16, 191, 40.00, 2, '2025-2026');
+(210, 16, 191, 40.00, 2, '2025-2026'),
+(234, 17, 137, 20.00, 1, '2025-2026'),
+(235, 16, 269, 25.00, 1, '2025-2026'),
+(236, 16, 270, 10.00, 1, '2025-2026'),
+(237, 16, 271, 13.00, 1, '2025-2026'),
+(238, 16, 272, 9.00, 1, '2025-2026'),
+(239, 16, 273, 8.00, 1, '2025-2026'),
+(240, 16, 274, 90.00, 1, '2025-2026'),
+(241, 16, 275, 95.00, 1, '2025-2026'),
+(242, 16, 276, 89.00, 1, '2025-2026'),
+(243, 16, 277, 40.00, 1, '2025-2026'),
+(244, 16, 278, 45.00, 1, '2025-2026'),
+(245, 16, 279, 46.00, 1, '2025-2026');
 
 -- --------------------------------------------------------
 
@@ -559,7 +547,6 @@ INSERT INTO `sections` (`id`, `name`, `grade_level`, `school_year`, `created_at`
 CREATE TABLE `students` (
   `id` int(11) NOT NULL,
   `school_id_number` varchar(20) NOT NULL,
-  `name` varchar(100) NOT NULL,
   `first_name` varchar(100) DEFAULT NULL,
   `last_name` varchar(100) DEFAULT NULL,
   `lrn` varchar(12) DEFAULT NULL,
@@ -574,13 +561,12 @@ CREATE TABLE `students` (
 -- Dumping data for table `students`
 --
 
-INSERT INTO `students` (`id`, `school_id_number`, `name`, `first_name`, `last_name`, `lrn`, `birth_date`, `gender`, `grade_level`, `section`, `created_at`) VALUES
-(16, '20261-00001', 'Habibi, Junior', 'Junior', 'Habibi', '293493929494', '2009-06-26', 'Male', 7, '1-A', '2026-06-02 07:41:19'),
-(17, '20261-00002', 'Habibi, Senior', 'Senior', 'Habibi', '128323737333', '2010-04-10', 'Female', 7, '1-A', '2026-06-02 07:41:58'),
-(18, '20261-00003', 'Doe, John', 'John', 'Doe', '721471273717', '2008-11-29', 'Male', 7, '1-B', '2026-06-03 06:43:23'),
-(19, '20261-00004', 'Dayo, Kimi', 'Kimi', 'Dayo', '123127377333', '2008-09-28', 'Female', 7, '1-B', '2026-06-03 06:44:48'),
-(20, '20261-00005', 'Core, Sound', 'Sound', 'Core', '112277373222', '2010-12-27', 'Male', 7, '1-C', '2026-06-03 06:45:25'),
-(21, '20261-00006', 'Os, Mac', 'Mac', 'Os', '322355533222', '2010-09-11', 'Female', 7, '1-C', '2026-06-03 06:46:41');
+INSERT INTO `students` (`id`, `school_id_number`, `first_name`, `last_name`, `lrn`, `birth_date`, `gender`, `grade_level`, `section`, `created_at`) VALUES
+(16, '20261-00001', 'Junior', 'Habibi', '293493929494', '2009-06-26', 'Male', 7, '1-A', '2026-06-02 07:41:19'),
+(17, '20261-00002', 'Senior', 'Habibi', '128323737333', '2010-04-10', 'Female', 7, '1-A', '2026-06-02 07:41:58'),
+(26, '20261-00008', 'Eli', 'Pitipiwpiw', '127371273712', '2009-08-14', 'Male', 7, '1-A', '2026-06-18 01:31:01'),
+(28, '20261-00010', 'Ball', 'Bill', '154675758679', '2009-10-22', 'Male', 7, '1-B', '2026-06-18 01:31:58'),
+(29, '20261-00011', 'Jul', 'Jukil', '124532132111', '2010-01-18', 'Male', 7, '1-B', '2026-06-18 01:32:22');
 
 -- --------------------------------------------------------
 
@@ -632,7 +618,8 @@ INSERT INTO `teacher_subject_section` (`id`, `teacher_id`, `subject_id`, `sectio
 (3, 8, 3, 1),
 (4, 12, 4, 1),
 (5, 14, 8, 1),
-(6, 13, 5, 1);
+(6, 13, 5, 1),
+(7, 17, 6, 1);
 
 -- --------------------------------------------------------
 
@@ -655,7 +642,7 @@ CREATE TABLE `term_grades` (
 
 INSERT INTO `term_grades` (`id`, `student_id`, `subject_id`, `term`, `school_year`, `final_grade`) VALUES
 (1, 16, 2, 1, '2025-2026', 92),
-(2, 17, 2, 1, '2025-2026', 0),
+(2, 17, 2, 1, '2025-2026', 61),
 (3, 16, 4, 1, '2025-2026', 92),
 (4, 17, 4, 1, '2025-2026', 0),
 (5, 16, 5, 1, '2025-2026', 92),
@@ -663,7 +650,11 @@ INSERT INTO `term_grades` (`id`, `student_id`, `subject_id`, `term`, `school_yea
 (7, 16, 1, 1, '2025-2026', 92),
 (8, 17, 1, 1, '2025-2026', 0),
 (9, 16, 1, 2, '2025-2026', 92),
-(10, 17, 1, 2, '2025-2026', 0);
+(10, 17, 1, 2, '2025-2026', 0),
+(11, 16, 3, 1, '2025-2026', 89),
+(12, 17, 3, 1, '2025-2026', 60),
+(15, 16, 6, 1, '2025-2026', 91),
+(16, 17, 6, 1, '2025-2026', 0);
 
 -- --------------------------------------------------------
 
@@ -692,7 +683,8 @@ INSERT INTO `users` (`id`, `username`, `password`, `full_name`, `role`, `created
 (13, 'ap_teacher', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Ms. AP Teacher', 'subject_teacher', '2026-06-03 06:27:05'),
 (14, 'mapeh_teacher', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Mrs. Mapeh Teacher', 'subject_teacher', '2026-06-03 06:39:22'),
 (15, 'filipino_teacher', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Mr. Filipino Teacher', 'subject_teacher', '2026-06-03 06:41:59'),
-(16, 'english_teacher', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Ms. English Teacher', 'subject_teacher', '2026-06-03 06:42:21');
+(16, 'english_teacher', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Ms. English Teacher', 'subject_teacher', '2026-06-03 06:42:21'),
+(17, 'esp_teacher', '$2y$10$xHjz/q.YPtRRKSLqFXpEo.z3/y8vBX2u.P6xBqjgqGUjOOFMq31ly', 'Mrs. Esp Teacher', 'subject_teacher', '2026-06-17 12:47:58');
 
 --
 -- Indexes for dumped tables
@@ -804,13 +796,13 @@ ALTER TABLE `audit_log`
 -- AUTO_INCREMENT for table `enrollments`
 --
 ALTER TABLE `enrollments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `scores`
 --
 ALTER TABLE `scores`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=211;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=246;
 
 --
 -- AUTO_INCREMENT for table `sections`
@@ -822,7 +814,7 @@ ALTER TABLE `sections`
 -- AUTO_INCREMENT for table `students`
 --
 ALTER TABLE `students`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT for table `subjects`
@@ -834,19 +826,19 @@ ALTER TABLE `subjects`
 -- AUTO_INCREMENT for table `teacher_subject_section`
 --
 ALTER TABLE `teacher_subject_section`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `term_grades`
 --
 ALTER TABLE `term_grades`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- Constraints for dumped tables
@@ -902,6 +894,3 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-
-ALTER TABLE `students`
-  DROP COLUMN name;
